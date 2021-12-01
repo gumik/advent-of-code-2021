@@ -1,13 +1,21 @@
-module Day01 ( run ) where
+module Day01 ( solution ) where
 
-run :: IO ()
-run = do
-    content <- readFile "data/day01-input.txt"
-    let input = map read (lines content) :: [Int]
-        output = increasedMeasurements input
-        output2 = increasedThreeMeasurementsWindow input
-    print output
-    print output2
+import Common (Solution(Solution), listOfNumbers)
+
+solution = Solution "day01" run
+
+-- run :: IO ()
+-- run = do
+--     content <- readFile "data/day01-input.txt"
+--     let input = map read (lines content) :: [Int]
+--         output = increasedMeasurements input
+--         output2 = increasedThreeMeasurementsWindow input
+--     print output
+--     print output2
+
+run :: String -> (Int, Int)
+run input = (increasedMeasurements numbers, increasedThreeMeasurementsWindow numbers) where
+    numbers = listOfNumbers input
 
 increasedMeasurements :: [Int] -> Int
 increasedMeasurements l = length $ filter (> 0) $ zipWith (-) (tail l) l
