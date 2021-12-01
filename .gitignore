@@ -1,0 +1,6 @@
+*.hi
+*.o
+run*.sh
+.stack-work/
+*~
+*.lock
