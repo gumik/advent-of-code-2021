@@ -9,8 +9,15 @@ import Data.Bifunctor (bimap)
 main :: IO ()
 main = do
     args <- getArgs
-    let solution = head $ filter ((== head args) . solutionName) solutions
-        name = solutionName solution
+    let solutionsToRun = filter (solutionNameMatch args . solutionName) solutions
+    mapM_ runSolution solutionsToRun
+
+solutionNameMatch args name = case args of
+    [] -> True
+    _  -> head args == name
+
+runSolution solution = do
+    let name = solutionName solution
         inputFile = "data/" ++ name ++ "-input.txt"
 
     input <- readFile inputFile
