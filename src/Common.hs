@@ -1,7 +1,9 @@
-module Common (Solution(..), NoSolution(..), listOfNumbers) where
+module Common (Solution(..), NoSolution(..), listOfNumbers, (!?), readNum) where
+import Numeric (readInt)
 
 data Solution a b = Solution {
     solutionName :: String,
+    solutionDescription :: String,
     solutionRun :: String -> (a, b)
 }
 
@@ -11,3 +13,11 @@ instance Show NoSolution where
 
 listOfNumbers :: String -> [Int]
 listOfNumbers content = map read (lines content) :: [Int]
+
+(!?) :: [a] -> Int -> Maybe a
+xs !? n = if n >= 0 && n < length xs
+    then Just $ xs !! n
+    else Nothing
+
+readNum :: String -> Int
+readNum = read

@@ -2,7 +2,7 @@ module Day01 ( solution ) where
 
 import Common (Solution(Solution), listOfNumbers)
 
-solution = Solution "day01" run
+solution = Solution "day01" "Sonar Sweep" run
 
 run :: String -> (Int, Int)
 run input = (increasedMeasurements numbers, increasedThreeMeasurementsWindow numbers) where
