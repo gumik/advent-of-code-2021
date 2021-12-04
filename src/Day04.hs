@@ -6,7 +6,7 @@ import Data.Bifunctor (bimap)
 import Data.List (transpose, partition)
 
 solution :: Solution Int Int
-solution = Solution "day04" "" run
+solution = Solution "day04" "Giant Squid" run
 
 run :: String -> (Int, Int)
 run input = let
@@ -14,26 +14,28 @@ run input = let
     steps = scanl step (Iteration boards 0 []) numbers
     in (scoreOfFirstWinningBoard steps, scoreOfLastWinningBoard steps)
 
+type Board = [[Int]]
+
+
 ------ parsing
 
-parse :: String -> ([Int], [[[Int]]])
+parse :: String -> ([Int], [Board])
 parse input = let
     parts = splitOn "\n\n" input
     numbers = parseNumbers $ head parts
     boards = parseBoards $ tail parts
     in (numbers, boards)
 
-parseBoards :: [String] -> [[[Int]]]
-parseBoards boardsStr = let
-    parseBoard str = filter (not . null) $ map (map read . words) (splitOn "\n" str)
-    in map parseBoard boardsStr
+parseBoards :: [String] -> [Board]
+parseBoards = map parseBoard where
+    parseBoard = filter (not . null) . map (map read . words) . splitOn "\n"
 
 parseNumbers :: String -> [Int]
-parseNumbers= map readNum . splitOn ","
+parseNumbers = map readNum . splitOn ","
+
 
 ------ solution
 
-type Board = [[Int]]
 data Iteration = Iteration {
     iterationBoards :: [Board],
     iterationNumber :: Int,
@@ -53,10 +55,10 @@ scoreOfLastWinningBoard steps = let
     in boardScore number board
 
 step :: Iteration -> Int -> Iteration
-step (Iteration boards _ _) number = let
+step (Iteration boards _ wonBoards) number = let
     newBoards = markBoards number boards
     (winningBoards, remainingBoards) = partition isWinning newBoards
-    in Iteration remainingBoards number winningBoards
+    in Iteration remainingBoards number (winningBoards ++ wonBoards) 
 
 markBoards :: Int -> [Board] -> [Board]
 markBoards number = map $ markBoard number
@@ -68,12 +70,10 @@ markBoard number = map markInRow where
 
 isWinning :: Board -> Bool
 isWinning board = let
+    isWinningRow = any (all (== (-1)))
     isWinningByRow = isWinningRow board
     isWinningByCol = isWinningRow (transpose board)
     in isWinningByRow || isWinningByCol
-
-isWinningRow :: Board -> Bool
-isWinningRow = any (all (== (-1)))
 
 boardScore :: Int -> Board -> Int
 boardScore number board = let
