@@ -1,7 +1,7 @@
 {-# LANGUAGE TupleSections #-}
 module Day06 ( solution ) where
 
-import Common (Solution(Solution), NoSolution(..), readNum)
+import Common (Solution(Solution), NoSolution(..), parseComaSeparatedNums)
 import Data.List.Split (splitOn)
 import Data.Bifunctor (bimap)
 import Data.List (iterate', sort)
@@ -12,11 +12,8 @@ solution = Solution "day06" "Lanternfish" run
 
 run :: String -> (Int, Int)
 run inputStr = let
-    input = parse inputStr
+    input = parseComaSeparatedNums inputStr
     in (howManyFish 80 input, howManyFish 256 input)
-
-parse :: String -> [Int]
-parse = map readNum . splitOn ","
 
 howManyFish :: Int -> [Int] -> Int
 howManyFish days population = sum $ simulate days (slotsFromPopulation population)

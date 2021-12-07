@@ -1,5 +1,6 @@
-module Common (Solution(..), NoSolution(..), listOfNumbers, (!?), readNum) where
+module Common (Solution(..), NoSolution(..), listOfNumbers, (!?), readNum, parseComaSeparatedNums) where
 import Numeric (readInt)
+import Data.List.Split (splitOn)
 
 data Solution a b = Solution {
     solutionName :: String,
@@ -21,3 +22,6 @@ xs !? n = if n >= 0 && n < length xs
 
 readNum :: String -> Int
 readNum = read
+
+parseComaSeparatedNums :: String -> [Int]
+parseComaSeparatedNums = map readNum . splitOn ","
