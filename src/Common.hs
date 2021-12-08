@@ -1,4 +1,4 @@
-module Common (Solution(..), NoSolution(..), listOfNumbers, (!?), readNum, parseComaSeparatedNums) where
+module Common (Solution(..), NoSolution(..), listOfNumbers, (!?), readNum, parseComaSeparatedNums, toDecimal) where
 import Numeric (readInt)
 import Data.List.Split (splitOn)
 
@@ -25,3 +25,6 @@ readNum = read
 
 parseComaSeparatedNums :: String -> [Int]
 parseComaSeparatedNums = map readNum . splitOn ","
+
+toDecimal :: Int -> [Int] -> Int 
+toDecimal nary digits = sum $ zipWith (\d c -> d * nary^c) (reverse digits) [0..]

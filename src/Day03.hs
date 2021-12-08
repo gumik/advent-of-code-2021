@@ -1,6 +1,6 @@
 module Day03 ( solution ) where
 
-import Common (Solution(Solution), NoSolution(..), readNum)
+import Common (Solution(Solution), NoSolution(..), readNum, toDecimal)
 import Data.List.Split (splitOn)
 import Data.Bifunctor (bimap)
 
@@ -19,7 +19,7 @@ powerConsumption :: Diagnostic -> Int
 powerConsumption input = let
     gamma = positiveNegativeToBinary $ sumNumbers input
     epsilon = invert gamma
-    in toDecimal gamma * toDecimal epsilon
+    in toDecimal 2 gamma * toDecimal 2 epsilon
 
 sumNumbers :: Diagnostic -> [Int]
 sumNumbers = foldl1 sumArrays
@@ -42,11 +42,6 @@ invert :: [Int] -> [Int]
 invert = map invertValue where
     invertValue value = if value == 0 then 1 else 0
 
-toDecimal :: [Int] -> Int
-toDecimal l = foldl calc 0 $ zip [0..] (reverse l) where
-    calc value (coeff, x) = value + 2^coeff * x
-
-
 lifeSupportRating :: Diagnostic -> Int
 lifeSupportRating numbers = let
     oxygenGeneratorRating = rating oxygenGeneratorSelector numbers
@@ -56,7 +51,7 @@ lifeSupportRating numbers = let
 rating :: (Int -> Int -> Bool) -> Diagnostic -> Int
 rating selector numbers = let 
     ratingList = head $ snd $ last $ takeWhile (not . null . snd) $ iterate (step selector) (0, numbers)
-    in toDecimal $ positiveNegativeToBinary ratingList
+    in toDecimal 2 $ positiveNegativeToBinary ratingList
 
 oxygenGeneratorSelector :: Int -> Int -> Bool
 oxygenGeneratorSelector sumValue value = if sumValue == 0 then value > 0 else sumValue * value > 0
