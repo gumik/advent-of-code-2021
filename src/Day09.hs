@@ -1,7 +1,7 @@
 {-# LANGUAGE TupleSections #-}
 module Day09 ( solution ) where
 
-import Common (Solution(Solution), NoSolution(..), readNum)
+import Common (Solution(Solution), NoSolution(..), parseArray, readNum', inArrayBounds)
 import Data.List.Split (splitOn)
 import Data.Bifunctor (bimap)
 import Data.Array
@@ -11,18 +11,9 @@ import Data.List (unfoldr, sort)
 solution = Solution "day09" "Smoke Basin" run
 
 run input = let
-    heightMap = parse input
+    heightMap = parseArray readNum' input
     lowPointsList = lowPoints heightMap
     in (sumOfRiskLevels heightMap lowPointsList, threeLargestBasinsMultiply heightMap lowPointsList)
-
-parse input = let
-    parsedLines = map (map readNum') $ lines input
-    width = length $ head parsedLines
-    height = length parsedLines
-    in listArray ((0, 0), (height-1, width-1)) $ concat parsedLines
-
-readNum' :: Char -> Int
-readNum' c = readNum [c]
 
 type HeightMap = Array Point Int
 type Point = (Int, Int)
@@ -43,11 +34,9 @@ neighbours :: Point -> [Point]
 neighbours (y, x) = [(y, x-1), (y-1, x), (y, x+1), (y+1, x)]
 
 pointHeight :: HeightMap -> Point -> Int
-pointHeight heightMap (y, x) = let
-    (_, (h, w)) = bounds heightMap
-    in if x < 0 || y < 0 || x > w || y > h
-        then 10
-        else heightMap ! (y, x)
+pointHeight heightMap (y, x)
+    | inArrayBounds heightMap (y, x)  = heightMap ! (y, x)
+    | otherwise                       = 10
 
 riskLevel :: HeightMap -> Point -> Int
 riskLevel heightMap yx = heightMap ! yx + 1
