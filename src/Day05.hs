@@ -29,7 +29,7 @@ pointsInStraightLine ((a, b), (c, d)) = [(x, y) | x <- range a c, y <- range b d
 
 pointsInDiagonalLine :: Line -> [Point]
 pointsInDiagonalLine ((a, b), (c, d)) = take (abs (a-c) + 1) $ iterate (add (dir a c) (dir b d)) (a, b)
-  
+
 dir :: Int -> Int -> Int
 dir a b = if a > b then -1 else 1
 

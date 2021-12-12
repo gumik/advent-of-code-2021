@@ -27,7 +27,7 @@ parse = M.fromListWith (++) . concatMap (edges . parseLine) . lines where
     parseLine = splitOn "-"
 
 edges :: [Node] -> [(Node, [Node])]
-edges [a, b] = case (a, b) of 
+edges [a, b] = case (a, b) of
     ("start", b) -> [("start", [b])]
     (a, "start") -> [("start", [a])]
     (a, "end")   -> [(a, ["end"])]
@@ -59,6 +59,6 @@ canVisit' :: CanVisitCheck
 canVisit' graph visitedCounts node
     | isSmall node  = visitedCounts M.! node <= 2  &&  M.size (M.filterWithKey (\k v -> isSmall k && v > 1) visitedCounts) < 2
     | otherwise     = True
-    
+
 isSmall :: Node -> Bool
 isSmall = isLower . head

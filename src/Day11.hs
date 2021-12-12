@@ -36,13 +36,13 @@ isOctopusAboutToFlash octopus = case octopus of
     JustFlashed -> False
 
 justFlushed octopus = case octopus of
-    JustFlashed -> True 
+    JustFlashed -> True
     _           -> False
 
 type Grid = Array (Int, Int) Octopus
 
 data Iteration = Iteration {
-    iterationArray :: Grid, 
+    iterationArray :: Grid,
     iterationStep :: Int,
     iterationIsIntermediate :: Bool,
     iterationTotalFlashes :: Int
@@ -67,7 +67,7 @@ step :: Iteration -> Iteration
 step (Iteration grid step isIntermediate totalFlashes)
     | isIntermediate = let
         aboutToFlash = map fst $ filter (isOctopusAboutToFlash . snd) $ assocs grid
-        octopusesToIncrease = concatMap (neighbours grid) aboutToFlash 
+        octopusesToIncrease = concatMap (neighbours grid) aboutToFlash
         grid' = grid // map (, JustFlashed) aboutToFlash
         grid'' = accum (\oct _ -> incrementOctopus oct) grid' (map (,0) octopusesToIncrease)
         isIntermediate' = not $ null aboutToFlash

@@ -22,7 +22,7 @@ sumOfRiskLevels :: HeightMap -> [Point] -> Int
 sumOfRiskLevels heightMap lowPointsList = sum $ map (riskLevel heightMap) lowPointsList
 
 lowPoints :: HeightMap -> [Point]
-lowPoints heightMap = filter (isLowPoint heightMap) (indices heightMap) 
+lowPoints heightMap = filter (isLowPoint heightMap) (indices heightMap)
 
 isLowPoint :: HeightMap -> Point -> Bool
 isLowPoint heightMap point = let

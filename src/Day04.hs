@@ -58,7 +58,7 @@ step :: Iteration -> Int -> Iteration
 step (Iteration boards _ wonBoards) number = let
     newBoards = markBoards number boards
     (winningBoards, remainingBoards) = partition isWinning newBoards
-    in Iteration remainingBoards number (winningBoards ++ wonBoards) 
+    in Iteration remainingBoards number (winningBoards ++ wonBoards)
 
 markBoards :: Int -> [Board] -> [Board]
 markBoards number = map $ markBoard number

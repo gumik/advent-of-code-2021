@@ -49,7 +49,7 @@ lifeSupportRating numbers = let
     in oxygenGeneratorRating *co2ScrubberRating
 
 rating :: (Int -> Int -> Bool) -> Diagnostic -> Int
-rating selector numbers = let 
+rating selector numbers = let
     ratingList = head $ snd $ last $ takeWhile (not . null . snd) $ iterate (step selector) (0, numbers)
     in toDecimal 2 $ positiveNegativeToBinary ratingList
 
