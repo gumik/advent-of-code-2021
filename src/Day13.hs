@@ -8,12 +8,14 @@ import Data.List (partition, nub, unfoldr, intercalate, transpose)
 import Data.Array (array, elems)
 import Debug.Trace (trace)
 
-solution = Solution "day13" "" run
+solution :: Solution Int ShowSheet
+solution = Solution "day13" "Transparent Origami" run
 
+run :: String -> (Int, ShowSheet)
 run input = let
     (points, commands) = parse input
     folds = scanl fold points commands
-    in (length $ head folds, showSheet $ last folds)
+    in (length (folds !! 1), showSheet $ last folds)
 
 type Point = (Int, Int)
 type Sheet = [Point]
