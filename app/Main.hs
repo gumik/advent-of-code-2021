@@ -29,6 +29,8 @@ import Day25 ( solution )
 import Common (Solution(..), (!?))
 import Data.Bifunctor (bimap)
 import Data.Maybe (fromMaybe)
+import Data.List (intercalate)
+import Data.List.Split (splitOn)
 
 main :: IO ()
 main = do
@@ -49,8 +51,8 @@ runSolution otherInput solution = do
 
     putStrLn $ name ++ " - " ++ description
     let (output1, output2) = solutionRun solution input
-    putStrLn $ "    " ++ output1
-    putStrLn $ "    " ++ output2
+    putStrLn $ showSolution output1
+    putStrLn $ showSolution output2
 
 solutions :: [Solution String String]
 solutions = [
@@ -82,3 +84,6 @@ solutions = [
 
 stringSolution :: (Show a1, Show a2) => Solution a1 a2 -> Solution String String
 stringSolution (Solution name desc run) = Solution name desc (bimap show show . run)
+
+showSolution :: String -> String
+showSolution = intercalate "\n" . map ("    " ++) . splitOn "\n"

@@ -40,4 +40,4 @@ executables:
     dependencies:
     - advent-of-code
     - containers
-  
+    - split
