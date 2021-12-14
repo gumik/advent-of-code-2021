@@ -11,7 +11,7 @@ type Rules = M.Map String Char
 type PairsCounts = M.Map String Int
 
 solution :: Solution Int Int
-solution = Solution "day14" "" run
+solution = Solution "day14" "Extended Polymerization" run
 
 run :: String -> (Int, Int)
 run input = let
