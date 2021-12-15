@@ -64,7 +64,7 @@ step iteration@(Iteration costArray queue bestPathCost)
         (point :-> cost, queue') = fromJust $ Q.minView queue
         points = neighbours costArray point
         (queue'', bestPathCost') = foldl (relax costArray cost) (queue', bestPathCost) points
-        in Iteration costArray queue'' bestPathCost'
+        in bestPathCost `seq` Iteration costArray queue'' bestPathCost'
 
 neighbours :: CostArray -> Point -> [Point]
 neighbours grid (y, x) = filter (inArrayBounds grid) [(y, x-1), (y-1, x), (y, x+1), (y+1, x)]
