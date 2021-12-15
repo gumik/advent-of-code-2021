@@ -27,6 +27,8 @@ library:
     - split
     - containers
     - array
+    - pqueue
+    - PSQueue
 
 executables:
   advent-of-code-exe:
