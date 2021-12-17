@@ -1,10 +1,10 @@
+{-# LANGUAGE LambdaCase #-}
 module Day16 ( solution ) where
 
-import Common (Solution(Solution), NoSolution(..), readNum, toDecimal, readNum')
-import Data.List.Split (splitOn)
+import Common (Solution(Solution), toDecimal)
 import qualified Data.Map.Strict as M
-import Debug.Trace (trace, traceShow)
-import Data.Maybe (listToMaybe)
+import Control.Monad.State (State(..), replicateM, evalState, gets, state)
+import Control.Monad.Loops (whileM, untilM)
 
 data Packet = Packet {
     _version :: Int,
@@ -12,6 +12,8 @@ data Packet = Packet {
 } deriving Show
 
 data PacketData = Literal Int | Operator Int [Packet] deriving Show
+data Bit = B0 | B1 deriving (Show, Eq)
+type ParseState = State [Bit]
 
 solution :: Solution Int Int
 solution = Solution "day16" "Packet Decoder" run
@@ -21,83 +23,69 @@ run input = let
     packet = parse input
     in (sumOfVersions packet, evaluate packet)
 
-hexToBin :: M.Map Char [Char]
+hexToBin :: M.Map Char [Bit]
 hexToBin = M.fromList [
-    ('0', "0000"),
-    ('1', "0001"),
-    ('2', "0010"),
-    ('3', "0011"),
-    ('4', "0100"),
-    ('5', "0101"),
-    ('6', "0110"),
-    ('7', "0111"),
-    ('8', "1000"),
-    ('9', "1001"),
-    ('A', "1010"),
-    ('B', "1011"),
-    ('C', "1100"),
-    ('D', "1101"),
-    ('E', "1110"),
-    ('F', "1111")]
+    ('0', [B0, B0, B0, B0]),
+    ('1', [B0, B0, B0, B1]),
+    ('2', [B0, B0, B1, B0]),
+    ('3', [B0, B0, B1, B1]),
+    ('4', [B0, B1, B0, B0]),
+    ('5', [B0, B1, B0, B1]),
+    ('6', [B0, B1, B1, B0]),
+    ('7', [B0, B1, B1, B1]),
+    ('8', [B1, B0, B0, B0]),
+    ('9', [B1, B0, B0, B1]),
+    ('A', [B1, B0, B1, B0]),
+    ('B', [B1, B0, B1, B1]),
+    ('C', [B1, B1, B0, B0]),
+    ('D', [B1, B1, B0, B1]),
+    ('E', [B1, B1, B1, B0]),
+    ('F', [B1, B1, B1, B1])]
 
 parse :: String -> Packet
-parse = fst . parsePacket . concatMap (hexToBin M.!) . filter (/= '\n')
+parse = evalState parsePacket . concatMap (hexToBin M.!) . filter (/= '\n')
 
-parsePacket :: String -> (Packet, String)
-parsePacket str = let
-    (versionStr, str') = splitAt 3 str
-    (packetIdStr, str'') = splitAt 3 str'
-    version = toDecimal' versionStr
-    packetId = toDecimal' packetIdStr
-    (packetData, str''') = case packetId of
-        4 -> parseLiteral str''
-        _ -> parseOperator packetId str''
-    in (Packet version packetData, str''')
+parsePacket :: ParseState Packet
+parsePacket = do
+    version <- toDecimal' <$> getBits 3
+    packetId <- toDecimal' <$> getBits 3
+    packetData <- parsePacketData packetId
+    return $ Packet version packetData
 
-parseLiteral :: String -> (PacketData, String)
-parseLiteral str = let
-    parts = segments str
-    (firstSegments, rest) = span ((== '1') . head) parts
-    binaryNum = concatMap tail firstSegments ++ tail (head rest)
-    in (Literal (toDecimal' binaryNum), concat $ tail rest)
+parsePacketData :: Int -> ParseState PacketData
+parsePacketData packetId = do
+    case packetId of
+        4 -> parseLiteral
+        _ -> do
+            operatorType <- head <$> getBits 1
+            case operatorType of
+                B0 -> parseOperatorType0 packetId
+                B1 -> parseOperatorType1 packetId
 
-parseOperator :: Int -> String -> (PacketData, String)
-parseOperator operatorId (lengthTypeID:rest) = case lengthTypeID of
-    '0' -> let
-        (totalLengthStr, rest') = splitAt 15 rest
-        totalLength = toDecimal' totalLengthStr
-        (subPackets, _) = parseSubPackets (take totalLength rest')
-        in (Operator operatorId subPackets, drop totalLength rest')
-    '1' -> let
-        (packetsNumStr, rest') = splitAt 11 rest
-        packetsNum = toDecimal' packetsNumStr
-        (subPackets, rest'') = parseSubPacketsN packetsNum rest'
-        in (Operator operatorId subPackets, rest'')
-    _   -> error "invalid operator length type id"
-parseOperator _ _ = error "data for operator too short"
+parseLiteral :: ParseState PacketData
+parseLiteral = do
+    segs <- whileM (gets $ (== B1) . head) (getBits 5)
+    lastSeg <- getBits 5
+    return $ Literal $ toDecimal' $ concatMap tail $ segs ++ [lastSeg]
 
-parseSubPackets :: String -> ([Packet], String)
-parseSubPackets [] = ([], [])
-parseSubPackets str = let
-    (packet, rest) = parsePacket str
-    (packets, rest') = parseSubPackets rest
-    in (packet : packets, rest')
+parseOperatorType0 :: Int -> ParseState PacketData
+parseOperatorType0 packetId = do
+    totalLength <- toDecimal' <$> getBits 15
+    ss <- getBits totalLength
+    let subPackets = evalState (untilM parsePacket $ gets null) ss
+    return $ Operator packetId subPackets
 
-parseSubPacketsN :: Int -> String -> ([Packet], String)
-parseSubPacketsN 0 rest = ([], rest)
-parseSubPacketsN n str = let
-    (packet, rest) = parsePacket str
-    (packets, rest') = parseSubPacketsN (n-1) rest
-    in (packet : packets, rest')
+parseOperatorType1 :: Int -> ParseState PacketData
+parseOperatorType1 packetId = do
+    packetsNum <- toDecimal' <$> getBits 11
+    subPackets <- replicateM packetsNum parsePacket
+    return $ Operator packetId subPackets
 
-toDecimal' :: String -> Int
-toDecimal' = toDecimal 2 . map readNum'
+getBits :: Int -> ParseState [Bit]
+getBits = state . splitAt
 
-segments :: [a] -> [[a]]
-segments [] = []
-segments str = a : segments b where
-    (a, b) = splitAt 5 str
-
+toDecimal' :: [Bit] -> Int
+toDecimal' = toDecimal 2 . map (\case B0 -> 0; B1 -> 1)
 
 sumOfVersions :: Packet -> Int
 sumOfVersions (Packet version packetData) = version + sumOfContained where

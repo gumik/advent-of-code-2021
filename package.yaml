@@ -27,8 +27,9 @@ library:
     - split
     - containers
     - array
-    - pqueue
     - PSQueue
+    - mtl
+    - monad-loops
 
 executables:
   advent-of-code-exe:
