@@ -49,6 +49,7 @@ split (Number x) = if x > 9
 split (Pair l r) = let
     sl = split l
     sr = split r
-    if isJust sl then Just $ Pair l r
+    in if isJust sl then Just $ Pair l r
         else if isJust sr then Just $ Pair l r
             else Nothing
+    
