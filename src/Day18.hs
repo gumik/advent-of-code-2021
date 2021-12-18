@@ -20,7 +20,7 @@ solution = Solution "day18" "" run
 
 run input = let
     fishes = map (evalState parseFish) (lines input)
-    in (magnitudeOfSum fishes, NoSolution)
+    in (magnitudeOfSum fishes, maxSumOfPairs fishes)
 
 parseFish :: ParseState Fish
 parseFish = do
@@ -82,11 +82,8 @@ reduce fish = case (explode fish, split fish) of
     (_, Just splitted) -> reduce splitted
     _                  -> fish
 
-addReduce :: Fish -> Fish -> Fish
-addReduce  l = reduce . Pair l
-
 magnitudeOfSum :: [Fish] -> Int
-magnitudeOfSum = magnitude . foldl1 addReduce
+magnitudeOfSum = magnitude . foldl1 (\l -> reduce . Pair l)
 
 magnitude :: Fish -> Int
 magnitude (Number x) = x
