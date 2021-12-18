@@ -82,4 +82,4 @@ reduce fish = case (explode fish, split fish) of
     (_, Just splitted) -> reduce splitted
     _                  -> fish
 
-sumFishes = foldl1 (\f1, f2 -> reduce $ Pair f1 f2)
+sumFishes = foldl1 (\f1 f2 -> reduce $ Pair f1 f2)
