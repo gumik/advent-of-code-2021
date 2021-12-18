@@ -31,7 +31,7 @@ parsePair = do
 
 parseNumber :: String -> ParseState Fish
 parseNumber = do
-    numStr = untilM readChar $ gets isDigit
+    numStr <- untilM readChar $ gets isDigit
     return $ Number $ readNum numStr
 
 readChar = ParseState Char
