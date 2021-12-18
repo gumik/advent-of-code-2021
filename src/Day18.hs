@@ -86,7 +86,7 @@ reduce fish = case (explode fish, split fish) of
     _                  -> fish
 
 addReduce :: Fish -> Fish -> Fish
-addReduce = (reduce . (+++))
+addReduce = reduce . (+++)
 
 sumFishes = foldl1 addReduce
 
