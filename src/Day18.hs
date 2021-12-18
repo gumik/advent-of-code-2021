@@ -16,7 +16,7 @@ solution = Solution "day18" "" run
 
 run input = let
     fishes = map (evalState parseFish) (lines input)
-    in (intercalate "\n" $ map show fishes, NoSolution)
+    in (map split fishes, NoSolution)
 
 parseFish :: ParseState Fish
 parseFish = do
