@@ -20,7 +20,7 @@ data Iteration = Iteration {
     iterationBestPathCost :: BestPathCost } deriving (Show)
 
 solution :: Solution Int Int
-solution = Solution "day15" "" run
+solution = Solution "day15" "Chiton" run
 
 run :: String -> (Int, Int)
 run input = let

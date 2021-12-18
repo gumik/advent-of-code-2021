@@ -2,12 +2,12 @@ module Day18 ( solution ) where
 
 import Common (Solution(Solution), NoSolution(..), readNum)
 import Data.List.Split (splitOn)
-import Data.List
-import Data.Char
-import Data.Maybe
+import Data.List ( uncons )
+import Data.Char ( isDigit )
+import Data.Maybe ( fromJust )
 import Control.Monad.State
-import Control.Monad.Loops
-import Debug.Trace
+    ( gets, evalState, MonadState(state, get), State )
+import Control.Monad.Loops ( whileM )
 
 data Fish = Number Int | Pair Fish Fish deriving Eq
 type ParseState = State String
@@ -16,7 +16,7 @@ instance Show Fish where
     show (Number x) = show x
     show (Pair l r) = "[" ++ show l ++ "," ++ show r ++ "]"
 
-solution = Solution "day18" "" run
+solution = Solution "day18" "Snailfish" run
 
 run input = let
     fishes = map (evalState parseFish) (lines input)
@@ -24,7 +24,7 @@ run input = let
 
 parseFish :: ParseState Fish
 parseFish = do
-    char <- head <$> get
+    char <- gets head
     case char of
         '[' -> parsePair
         _   -> parseNumber
@@ -59,7 +59,7 @@ explode :: Fish -> Maybe Fish
 explode fish = case explode' 4 fish of
     Just (fish, _, _) -> Just fish
     _ -> Nothing
-    
+
 explode' :: Int -> Fish -> Maybe (Fish, Int, Int)
 explode' 0 fish@(Pair (Number l) (Number r)) = Just (Number 0, l, r)
 explode' n (Pair l r) = case (explode' (n-1) l, explode' (n-1) r) of
@@ -90,6 +90,5 @@ magnitude (Number x) = x
 magnitude (Pair l r) = 3 * magnitude l + 2 * magnitude r
 
 maxSumOfPairs :: [Fish] -> Int
-maxSumOfPairs fishes = maximum $ map magnitudeOfSum pairs where 
+maxSumOfPairs fishes = maximum $ map magnitudeOfSum pairs where
     pairs = [[f1, f2] | f1 <- fishes, f2 <- fishes, f1 /= f2]
-    
