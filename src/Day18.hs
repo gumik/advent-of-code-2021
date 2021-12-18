@@ -85,10 +85,10 @@ reduce fish = case (explode fish, split fish) of
     (_, Just splitted) -> reduce splitted
     _                  -> fish
 
-addReduce :: Fish -> Fish -> Fish
-addReduce = reduce . (+++)
+--addReduce :: Fish -> Fish -> Fish
+--addReduce = reduce . (+++)
 
-sumFishes = foldl1 addReduce
+sumFishes = foldl1 (\l r -> reduce $ Pair l r)
 
 
 
