@@ -16,7 +16,7 @@ solution = Solution "day18" "" run
 
 run input = let
     fishes = map (evalState parseFish) (lines input)
-    in (map split fishes, NoSolution)
+    in (map reduce fishes, NoSolution)
 
 parseFish :: ParseState Fish
 parseFish = do
@@ -50,3 +50,6 @@ split (Pair l r) = case (split l, split r) of
         (Just sl, _) -> Just $ Pair sl r
         (_, Just sr) -> Just $ Pair l sr
         _            -> Nothing
+
+reduce :: Fish -> Fish
+reduce = last . takeWhile isJust . iterate split
