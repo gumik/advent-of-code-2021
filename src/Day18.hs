@@ -20,7 +20,7 @@ solution = Solution "day18" "" run
 
 run input = let
     fishes = map (evalState parseFish) (lines input)
-    in (map reduce fishes, NoSolution)
+    in (sumFishes fishes, NoSolution)
 
 parseFish :: ParseState Fish
 parseFish = do
@@ -41,7 +41,7 @@ parsePair = do
 parseNumber :: ParseState Fish
 parseNumber = do
     numStr <- whileM (gets (isDigit . head)) readChar
-    trace ("numStr '" ++ numStr ++ "'") $ return $ Number $ readNum numStr
+    return $ Number $ readNum numStr
 
 readChar :: ParseState Char
 readChar = state $ fromJust . uncons
@@ -81,3 +81,5 @@ reduce fish = case (explode fish, split fish) of
     (Just exploded, _) -> reduce exploded
     (_, Just splitted) -> reduce splitted
     _                  -> fish
+
+sumFishes = foldl1 (\f1, f2 -> reduce $ Pair f1 f2)
