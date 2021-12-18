@@ -88,7 +88,7 @@ reduce fish = case (explode fish, split fish) of
 --addReduce :: Fish -> Fish -> Fish
 --addReduce = reduce . (+++)
 
-sumFishes = foldl1 (\l r -> reduce $ Pair l r)
+sumFishes = foldl1 (\l -> reduce . Pair l)
 
 
 
