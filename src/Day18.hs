@@ -8,12 +8,14 @@ import Data.Maybe
 import Control.Monad.State
 import Control.Monad.Loops
 
-data Fish = Number Int | Pair Fish Fish
+data Fish = Number Int | Pair Fish Fish deriving Show
 type ParseState = State String
 
 solution = Solution "day18" "" run
 
-run _ = (NoSolution, NoSolution)
+run input = let
+    fishes = map (evalState parseFish) (lines input)
+    in (intercalate "\n" $ map show fishes, NoSolution)
 
 parseFish :: ParseState Fish
 parseFish = do
