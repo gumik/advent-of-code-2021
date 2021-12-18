@@ -46,10 +46,7 @@ split :: Fish -> Maybe Fish
 split (Number x) = if x > 9
     then Just $ Pair (Number $ x `div` 2) (Number $ (x+1) `div` 2)
     else Nothing
-split (Pair l r) = let
-    sl = split l
-    sr = split r
-    in if isJust sl then Just $ Pair l r
-        else if isJust sr then Just $ Pair l r
-            else Nothing
-    
+split (Pair l r) = case (split l, split r) of
+        (Just sl, _) -> Just $ Pair sl r
+        (_, Just sr) -> Just $ Pair l sr
+        _            -> Nothing
