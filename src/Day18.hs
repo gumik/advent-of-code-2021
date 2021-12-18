@@ -2,6 +2,7 @@ module Day18 ( solution ) where
 
 import Common (Solution(Solution), NoSolution(..), readNum)
 import Data.List.Split (splitOn)
+import Data.List
 import Data.Char
 import Control.Monad.State
 import Control.Monad.Loops
