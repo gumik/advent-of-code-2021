@@ -13,14 +13,14 @@ solution = Solution "day18" "" run
 
 run _ = (NoSolution, NoSolution)
 
-parseFish :: String -> ParseState Fish
+parseFish :: ParseState Fish
 parseFish = do
     char <- head <$> get
     case char of
         '[' -> parsePair
         _   -> parseNumber
 
-parsePair :: String -> ParseState Fish
+parsePair :: ParseState Fish
 parsePair = do
     readChar
     sub1 <- parseFish
@@ -29,7 +29,7 @@ parsePair = do
     readChar
     return $ Pair sub1 sub2
 
-parseNumber :: String -> ParseState Fish
+parseNumber :: ParseState Fish
 parseNumber = do
     numStr <- untilM readChar $ gets isDigit
     return $ Number $ readNum numStr
