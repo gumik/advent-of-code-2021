@@ -51,6 +51,9 @@ split (Pair l r) = case (split l, split r) of
         (_, Just sr) -> Just $ Pair l sr
         _            -> Nothing
 
+explode :: Fish -> Maybe Fish
+explode _ = Nothing
+
 reduce :: Fish -> Fish
 reduce fish = case (explode fish, split fish) of
     (Just exploded, _) -> reduce exploded
