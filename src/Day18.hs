@@ -9,7 +9,7 @@ import Control.Monad.State
 import Control.Monad.Loops
 import Debug.Trace
 
-data Fish = Number Int | Pair Fish Fish deriving Show
+data Fish = Number Int | Pair Fish Fish
 type ParseState = State String
 
 instance Show Fish where
