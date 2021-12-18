@@ -52,4 +52,7 @@ split (Pair l r) = case (split l, split r) of
         _            -> Nothing
 
 reduce :: Fish -> Fish
-reduce = fromJust . last . takeWhile isJust . iterate (maybe Nothing split) . Just
+reduce fish = case (explode fish, split fish) of
+    (Just exploded, _) -> reduce exploded
+    (_, Just splitted) -> reduce splitted
+    _                  -> fish
