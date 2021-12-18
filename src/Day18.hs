@@ -7,6 +7,7 @@ import Data.Char
 import Data.Maybe
 import Control.Monad.State
 import Control.Monad.Loops
+import Debug.Trace
 
 data Fish = Number Int | Pair Fish Fish deriving Show
 type ParseState = State String
@@ -36,7 +37,7 @@ parsePair = do
 parseNumber :: ParseState Fish
 parseNumber = do
     numStr <- untilM readChar $ gets (isDigit . head)
-    return $ Number $ readNum numStr
+    trace numStr $ return $ Number $ readNum numStr
 
 readChar :: ParseState Char
 readChar = state $ fromJust . uncons
