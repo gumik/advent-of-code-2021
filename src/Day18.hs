@@ -56,7 +56,7 @@ explode fish = case explode' 4 fish of
     Just (fish, _, _) -> Just fish
     _ -> Nothing
     
-explode' :: Fish -> Maybe (Fish, Int, Int)
+explode' :: Int -> Fish -> Maybe (Fish, Int, Int)
 explode' 0 fish@(Pair (Number l) (Number r)) = Just (Number 0, l, r)
 explode' n (Pair l r) = case (explode' (n-1) l, explode' (n-1) r) of
     (Just (ll, _, _), _) -> Just (Pair ll r, 0, 0)
