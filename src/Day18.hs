@@ -59,6 +59,7 @@ explode' n (Pair l r) = case (explode' (n-1) l, explode' (n-1) r) of
     (Just ll, _) -> Just ll
     (_, Just rr) -> Just rr
     _            -> Nothing
+explode' _ _ = Nothing
 
 reduce :: Fish -> Fish
 reduce fish = case (explode fish, split fish) of
