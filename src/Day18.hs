@@ -85,7 +85,11 @@ reduce fish = case (explode fish, split fish) of
     (_, Just splitted) -> reduce splitted
     _                  -> fish
 
-sumFishes = foldl1 (reduce . (+++))
+addReduce :: Fish -> Fish -> Fish
+addReduce = (reduce . (+++))
+
+sumFishes = foldl1 addReduce
+
 
 
 magnitude (Number x) = x
