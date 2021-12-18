@@ -37,7 +37,7 @@ parsePair = do
 parseNumber :: ParseState Fish
 parseNumber = do
     numStr <- untilM readChar $ gets (isDigit . head)
-    trace numStr $ return $ Number $ readNum numStr
+    trace ("numStr '" ++ numStr ++ "'") $ return $ Number $ readNum numStr
 
 readChar :: ParseState Char
 readChar = state $ fromJust . uncons
