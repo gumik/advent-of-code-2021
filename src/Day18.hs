@@ -16,6 +16,7 @@ instance Show Fish where
     show (Number x) = show x
     show (Pair l r) = "[" ++ show l ++ "," ++ show r ++ "]"
 
+(+++) :: Fish -> Fish -> Fish
 l +++ r = Pair l r
 
 solution = Solution "day18" "" run
