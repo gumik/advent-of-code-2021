@@ -52,7 +52,13 @@ split (Pair l r) = case (split l, split r) of
         _            -> Nothing
 
 explode :: Fish -> Maybe Fish
-explode _ = Nothing
+explode fish = explode' 4 fish
+
+explode' 0 fish@(Pair (Number l) (Number r)) = Just fish
+explode' n (Pair l r) = case (explode' l, explode' r) of
+    (Just ll, _) -> Just ll
+    (_, Just rr) -> Just rr
+    _            -> Nothing
 
 reduce :: Fish -> Fish
 reduce fish = case (explode fish, split fish) of
