@@ -54,10 +54,11 @@ split (Pair l r) = case (split l, split r) of
 explode :: Fish -> Maybe Fish
 explode fish = explode' 4 fish
 
-explode' 0 fish@(Pair (Number l) (Number r)) = Just fish
+explode' :: Fish -> Maybe (Fish, Int, Int)
+explode' 0 fish@(Pair (Number l) (Number r)) = Just (Number 0, l, r)
 explode' n (Pair l r) = case (explode' (n-1) l, explode' (n-1) r) of
-    (Just ll, _) -> Just ll
-    (_, Just rr) -> Just rr
+    (Just (ll, _, _), _) -> Just (Pair ll r, 0, 0)
+    (_, Just (rr, _, _)) -> Just (Pair l rr, 0, 0)
     _            -> Nothing
 explode' _ _ = Nothing
 
