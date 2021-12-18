@@ -12,6 +12,10 @@ import Debug.Trace
 data Fish = Number Int | Pair Fish Fish deriving Show
 type ParseState = State String
 
+instance Show Fish where
+    show (Number x) = show x
+    show (Pair l r) = "[" ++ show l ++ "," ++ show r ++ "]"
+
 solution = Solution "day18" "" run
 
 run input = let
