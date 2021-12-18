@@ -34,5 +34,5 @@ parseNumber = do
     numStr <- untilM readChar $ gets isDigit
     return $ Number $ readNum numStr
 
-readChar = ParseState Char
+readChar :: ParseState Char
 readChar = state . map (head . fst) . splitAt 1
