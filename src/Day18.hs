@@ -16,6 +16,8 @@ instance Show Fish where
     show (Number x) = show x
     show (Pair l r) = "[" ++ show l ++ "," ++ show r ++ "]"
 
+l +++ r = Pair l r
+
 solution = Solution "day18" "" run
 
 run input = let
@@ -82,7 +84,7 @@ reduce fish = case (explode fish, split fish) of
     (_, Just splitted) -> reduce splitted
     _                  -> fish
 
-sumFishes = foldl1 (\f1 f2 -> reduce $ Pair f1 f2)
+sumFishes = foldl1 (reduce . (+++))
 
 
 magnitude (Number x) = x
