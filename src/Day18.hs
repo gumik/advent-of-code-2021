@@ -4,6 +4,7 @@ import Common (Solution(Solution), NoSolution(..), readNum)
 import Data.List.Split (splitOn)
 import Data.List
 import Data.Char
+import Data.Maybe
 import Control.Monad.State
 import Control.Monad.Loops
 
@@ -36,4 +37,4 @@ parseNumber = do
     return $ Number $ readNum numStr
 
 readChar :: ParseState Char
-readChar = state uncons
+readChar = state $ fromJust . uncons
