@@ -20,7 +20,7 @@ solution = Solution "day18" "" run
 
 run input = let
     fishes = map (evalState parseFish) (lines input)
-    in (sumFishes fishes, NoSolution)
+    in (magnitude $ sumFishes fishes, NoSolution)
 
 parseFish :: ParseState Fish
 parseFish = do
@@ -83,3 +83,7 @@ reduce fish = case (explode fish, split fish) of
     _                  -> fish
 
 sumFishes = foldl1 (\f1 f2 -> reduce $ Pair f1 f2)
+
+
+magnitude (Number x) = x
+magnitude (Pair l r) = 3 * magnitude l + 2 * magnitude r
