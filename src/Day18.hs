@@ -35,4 +35,4 @@ parseNumber = do
     return $ Number $ readNum numStr
 
 readChar :: ParseState Char
-readChar = state $ map (head . fst) . splitAt 1
+readChar = state uncons
