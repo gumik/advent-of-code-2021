@@ -9,7 +9,7 @@ import Control.Monad.State
 import Control.Monad.Loops
 import Debug.Trace
 
-data Fish = Number Int | Pair Fish Fish
+data Fish = Number Int | Pair Fish Fish deriving Eq
 type ParseState = State String
 
 instance Show Fish where
@@ -92,3 +92,7 @@ magnitude :: Fish -> Int
 magnitude (Number x) = x
 magnitude (Pair l r) = 3 * magnitude l + 2 * magnitude r
 
+maxSumOfPairs :: [Fish] -> Int
+maxSumOfPairs fishes = maximum $ map magnitudeOfSum pairs where 
+    pairs = [[f1, f2] | f1 <- fishes, f2 <- fishes, f1 /= f2]
+    
