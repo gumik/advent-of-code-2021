@@ -41,3 +41,14 @@ parseNumber = do
 
 readChar :: ParseState Char
 readChar = state $ fromJust . uncons
+
+split :: Fish -> Maybe Fish
+split (Number x) = if x > 9
+    then Just $ Pair (Number $ x `div` 2) (Number $ (x+1) `div` 2)
+    else Nothing
+split (Pair l r) = let
+    sl = split l
+    sr = split r
+    if isJust sl then Just $ Pair l r
+        else if isJust sr then Just $ Pair l r
+            else Nothing
