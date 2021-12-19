@@ -6,4 +6,10 @@ import Data.Bifunctor (bimap)
 
 solution = Solution "day19" "" run
 
-run _ = (NoSolution, NoSolution)
+run input = let
+    scanners = parse input
+    in (scannersa, NoSolution)
+
+parse = map parseScanner . splitOn "\n\n" where
+    parseScanner = parseLine . tail . lines
+    parseLine = map readNum . splitOn ","
