@@ -11,5 +11,5 @@ run input = let
     in (scanners, NoSolution)
 
 parse = map parseScanner . splitOn "\n\n" where
-    parseScanner = parseLine . tail . lines
+    parseScanner = map parseLine . tail . lines
     parseLine = map readNum . splitOn ","
