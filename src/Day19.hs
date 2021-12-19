@@ -12,5 +12,5 @@ run input = let
 
 parse = map parseScanner . splitOn "\n\n" where
     parseScanner = map parseLine . tail . lines
-    parseLine l = toTyple . map readNum . splitOn ","
+    parseLine l = toTuple . map readNum . splitOn ","
     toTuple [x,y,z] = (x,y,z)
