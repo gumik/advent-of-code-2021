@@ -8,7 +8,7 @@ solution = Solution "day19" "" run
 
 run input = let
     scanners = parse input
-    in (scannersa, NoSolution)
+    in (scanners, NoSolution)
 
 parse = map parseScanner . splitOn "\n\n" where
     parseScanner = parseLine . tail . lines
