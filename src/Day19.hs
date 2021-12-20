@@ -9,7 +9,7 @@ import Data.Foldable (maximumBy)
 import Data.Function (on)
 import qualified Data.Array as A
 import qualified Data.Map as M
-import Debug.Trace (traceShow)
+import Debug.Trace (traceShow, trace)
 import Data.List (nub)
 
 -- Really ugly code. But struggled so much with this puzzle that I don't like to make it better. :)
@@ -29,9 +29,7 @@ solution = Solution "day19" "" run
 run :: String -> (Int, Int)
 run input = let
     scanners = parse input
-    matches = map (\(idx, (idx2, m)) -> (idx, (idx2, fromJust m))) $ filter (isJust . snd . snd) [(s1Idx, (s2Idx, match s1 s2)) | (s1Idx, s1) <- [0..] `zip` scanners, (s2Idx, s2) <- [0..] `zip` scanners, s1 /= s2] :: [(Int, (Int, (Rotation, Offset)))]
-    matches' = M.fromListWith (++) (map (\(s1idx, (s2idx, (rotation, offset))) -> (s1idx, [(s2idx, rotation, offset)])) matches) :: M.Map Int [(Int, Rotation, Offset)]
-    iterations = iterate merge (Iteration scanners matches' [0] S.empty (M.fromList [(idx, id) | idx <- [0..length scanners - 1]]))
+    iterations = iterate merge (Iteration scanners (findMatches M.empty scanners 0) [0] S.empty (M.fromList [(idx, id) | idx <- [0..length scanners - 1]]))
     Iteration _ _ _ resultSet rotOffs = head $ dropWhile (not . null . _scannersToAdd) iterations
     scannersPositions = map (head . ($ [(0,0,0)])) $ M.elems rotOffs
     in (S.size resultSet, maxDistance scannersPositions)
@@ -68,6 +66,12 @@ rotations = [angle . side | side <- sides, angle <- angles] where
     sides = [id, rotateX, rotateX . rotateX, rotateX . rotateX . rotateX, rotateZ, rotateZ . rotateZ . rotateZ]
     angles = [id, rotateY, rotateY . rotateY, rotateY . rotateY . rotateY]
 
+findMatches :: Matches -> [Scanner] -> Int -> Matches
+findMatches matches scanners s1Idx = let
+    s1 = scanners !! s1Idx
+    m = map (\(idx, (idx2, m)) -> (idx, (idx2, fromJust m))) $ filter (isJust . snd . snd) [(s1Idx, (s2Idx, match s1 s2)) | (s2Idx, s2) <- [0..] `zip` scanners, s1 /= s2, not $ s2Idx `M.member` matches] :: [(Int, (Int, (Rotation, Offset)))]
+    in M.union matches $ M.fromListWith (++) (map (\(s1idx, (s2idx, (rotation, offset))) -> (s1idx, [(s2idx, rotation, offset)])) m) :: M.Map Int [(Int, Rotation, Offset)]
+
 match :: Scanner -> Scanner -> Maybe (Rotation, Offset)
 match points scanner = let
     pointsSet = S.fromList points
@@ -92,11 +96,13 @@ data Iteration = Iteration {
     _resultSet :: S.Set Point,
     _rotOffs :: M.Map Int RotOff}
 
+matchesDebug = show . M.map (map (\(idx, _, _) -> idx))
+
 merge :: Iteration -> Iteration
 merge it@(Iteration _ _ [] _ _) = it
 merge (Iteration scanners matches scannersToAdd resultSet rotOffs) = let
     (scanners', matches', resultSet', scannersToAdd', rotOffs') = foldl mergeScanner (scanners, matches, resultSet, [], rotOffs) scannersToAdd
-    in Iteration scanners' matches' scannersToAdd' resultSet' rotOffs'
+    in trace ("matches: " ++ matchesDebug matches) $ Iteration scanners' matches' scannersToAdd' resultSet' rotOffs'
 
 rotOff :: Rotation -> Offset -> Scanner -> Scanner
 rotOff rotation offset scanner = move (rotation scanner) offset
@@ -108,7 +114,7 @@ mergeScanner (scanners, matches, resultSet, pointsToAdd, rotOffs) s1Idx = let
     resultSet' = S.union resultSet (S.fromList s1)
     neighbours = map (\(s2Idx, rotation, offset) -> (s2Idx, rotOff rotation offset)) $ matches M.! s1Idx :: [(Int, RotOff)]
     scanners' = scanners
-    matches' = M.map (filter (\(idx, _, _) -> idx /= s1Idx)) $ M.delete s1Idx matches
+    matches' = foldl(\matches point -> M.insertWith (++) point [] $ findMatches matches scanners point) matches pointsToAdd'
     pointsToAdd' = map fst neighbours
     rotOffs' = foldl (\rotOffs (idx, ro) -> M.insert idx (s1RotOff . ro) rotOffs) rotOffs neighbours
     in (scanners', matches', resultSet', nub $ pointsToAdd ++ pointsToAdd', rotOffs')
