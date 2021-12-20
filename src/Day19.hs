@@ -16,6 +16,9 @@ type Point = (Int, Int, Int)
 type Offset = Point
 type Scanner = [Point]
 type Rotation = Scanner -> Scanner
+type RotOff = Scanner -> Scanner
+
+minimumCommon = 12
 
 solution = Solution "day19" "" run
 
@@ -29,10 +32,10 @@ run input = let
     matches = map (\(idx, (idx2, m)) -> (idx, (idx2, fromJust m))) $ filter (isJust . snd . snd) [(s1Idx, (s2Idx, match s1 s2)) | (s1Idx, s1) <- [0..] `zip` scanners, (s2Idx, s2) <- [0..] `zip` scanners, s1 /= s2] :: [(Int, (Int, (Rotation, Offset)))]
     matches' = M.fromListWith (++) (map (\(s1idx, (s2idx, (rotation, offset))) -> (s1idx, [(s2idx, rotation, offset)])) matches) :: M.Map Int [(Int, Rotation, Offset)]
 
-    iterations = iterate merge (Iteration scanners matches' [0] S.empty)
-    in (traceShow (matchesDebug matches') $ map showIteration (take 10 iterations) , 0)
+    iterations = iterate merge (Iteration scanners matches' [0] S.empty (M.fromList [(idx, id) | idx <- [0..length scanners - 1]]))
+    in traceShow (matchesDebug matches') (S.size $ _resultSet $ head $ dropWhile (not . null . _scannersToAdd) iterations, 0)
 
-showIteration (Iteration _ matches toAdd resultSet) = (matchesDebug matches, toAdd, S.size resultSet)
+showIteration (Iteration _ matches toAdd resultSet rotOffs) = (matchesDebug matches, toAdd, S.size resultSet)
 
 matchesDebug = M.map (map (\(idx, _, _) -> idx))
 
@@ -79,7 +82,7 @@ match points scanner = let
     pointsSet = S.fromList points
     commons = map (\rotation -> (maxCommonPoints pointsSet (rotation scanner), rotation)) rotations :: [((Int, Point), Rotation)] -- ((overlap cnt, offset), rotation)
     ((maxOverlapSize, offset), rotation) = maximumBy (compare `on` fst) commons
-    in if maxOverlapSize >= 12 then Just (rotation, offset) else Nothing
+    in if maxOverlapSize >= minimumCommon then Just (rotation, offset) else Nothing
 
 maxCommonPoints :: S.Set Point -> [Point] -> (Int, Point)
 maxCommonPoints p1 p2 = let
@@ -108,22 +111,29 @@ data Iteration = Iteration {
     _scanners :: [Scanner],
     _matches :: Matches,
     _scannersToAdd :: [Int],
-    _resultSet :: S.Set Point}
+    _resultSet :: S.Set Point,
+    _rotOffs :: M.Map Int RotOff}
 
 merge :: Iteration -> Iteration
-merge it@(Iteration _ _ [] _) = it
-merge (Iteration scanners matches scannersToAdd resultSet) = let
-    (scanners', matches', resultSet', scannersToAdd') = foldl mergeScanner (scanners, matches, resultSet, []) scannersToAdd
-    in Iteration scanners' matches' scannersToAdd' resultSet'
+merge it@(Iteration _ _ [] _ _) = it
+merge (Iteration scanners matches scannersToAdd resultSet rotOffs) = let
+    (scanners', matches', resultSet', scannersToAdd', rotOffs') = foldl mergeScanner (scanners, matches, resultSet, [], rotOffs) scannersToAdd
+    in traceShow (length scannersToAdd) $ Iteration scanners' matches' scannersToAdd' resultSet' rotOffs'
 
-mergeScanner :: ([Scanner], Matches, S.Set Point, [Int]) -> Int -> ([Scanner], Matches, S.Set Point, [Int])
-mergeScanner (scanners, matches, resultSet, pointsToAdd) s1Idx = let
-    s1 = scanners !! s1Idx
+rotOff :: Rotation -> Offset -> Scanner -> Scanner
+rotOff rotation offset scanner = move (rotation scanner) offset
+
+mergeScanner :: ([Scanner], Matches, S.Set Point, [Int], M.Map Int RotOff) -> Int -> ([Scanner], Matches, S.Set Point, [Int], M.Map Int RotOff)
+mergeScanner (scanners, matches, resultSet, pointsToAdd, rotOffs) s1Idx = let
+    s1RotOff = rotOffs M.! s1Idx
+    s1 = s1RotOff (scanners !! s1Idx)
     -- resultSet' = foldl S.union resultSet (map (S.fromList . snd) neighbours)
     resultSet' = S.union resultSet (S.fromList s1)
-    neighbours = map (\(s2Idx, rotation, offset) -> (s2Idx, move (rotation $ scanners !! s2Idx) offset)) $ matches M.! s1Idx :: [(Int, Scanner)]
-    neighboursMap = M.fromList neighbours
-    scanners' = zipWith (\idx scanner -> M.findWithDefault scanner idx neighboursMap) [0..] scanners
+    neighbours = map (\(s2Idx, rotation, offset) -> (s2Idx, rotOff rotation offset)) $ matches M.! s1Idx :: [(Int, RotOff)]
+    neighboursMap = M.fromList $ map (\(idx, rotOff) -> (idx, (rotOffs' M.! idx) (scanners !! idx))) neighbours
+    --scanners' = zipWith (\idx scanner -> M.findWithDefault scanner idx neighboursMap) [0..] scanners
+    scanners' = scanners
     matches' = M.map (filter (\(idx, _, _) -> idx /= s1Idx)) $ M.delete s1Idx matches
     pointsToAdd' = map fst neighbours
-    in (scanners', matches', resultSet', nub $ pointsToAdd ++ pointsToAdd')
+    rotOffs' = foldl (\rotOffs (idx, ro) -> M.update (\ro' -> Just $ s1RotOff . ro) idx rotOffs) rotOffs neighbours
+    in (scanners', matches', resultSet', nub $ pointsToAdd ++ pointsToAdd', rotOffs')
