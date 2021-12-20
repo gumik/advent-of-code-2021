@@ -9,7 +9,8 @@ module Common (
     toDecimal,
     parseArray,
     showArray,
-    inArrayBounds) where
+    inArrayBounds,
+    ShowString(..)) where
 import Numeric (readInt)
 import Data.List.Split (splitOn, splitEvery)
 import Data.Array
@@ -23,6 +24,10 @@ data Solution a b = Solution {
 data NoSolution = NoSolution
 instance Show NoSolution where
     show NoSolution = "(no solution)"
+
+newtype ShowString = ShowString String
+instance Show ShowString where
+    show (ShowString s) = s
 
 listOfNumbers :: String -> [Int]
 listOfNumbers content = map read (lines content) :: [Int]
@@ -41,7 +46,7 @@ readNum' c = readNum [c]
 parseComaSeparatedNums :: String -> [Int]
 parseComaSeparatedNums = map readNum . splitOn ","
 
-toDecimal :: Int -> [Int] -> Int 
+toDecimal :: Int -> [Int] -> Int
 toDecimal nary digits = sum $ zipWith (\d c -> d * nary^c) (reverse digits) [0..]
 
 parseArray :: (Char -> a) -> String -> Array (Int, Int) a
