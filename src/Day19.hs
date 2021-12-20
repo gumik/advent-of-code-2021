@@ -24,7 +24,7 @@ minimumCommon :: Int
 minimumCommon = 12
 
 solution :: Solution Int Int
-solution = Solution "day19" "" run
+solution = Solution "day19" "Beacon Scanner" run
 
 run :: String -> (Int, Int)
 run input = let
@@ -96,13 +96,11 @@ data Iteration = Iteration {
     _resultSet :: S.Set Point,
     _rotOffs :: M.Map Int RotOff}
 
-matchesDebug = show . M.map (map (\(idx, _, _) -> idx))
-
 merge :: Iteration -> Iteration
 merge it@(Iteration _ _ [] _ _) = it
 merge (Iteration scanners matches scannersToAdd resultSet rotOffs) = let
     (scanners', matches', resultSet', scannersToAdd', rotOffs') = foldl mergeScanner (scanners, matches, resultSet, [], rotOffs) scannersToAdd
-    in trace ("matches: " ++ matchesDebug matches) $ Iteration scanners' matches' scannersToAdd' resultSet' rotOffs'
+    in Iteration scanners' matches' scannersToAdd' resultSet' rotOffs'
 
 rotOff :: Rotation -> Offset -> Scanner -> Scanner
 rotOff rotation offset scanner = move (rotation scanner) offset
@@ -116,7 +114,7 @@ mergeScanner (scanners, matches, resultSet, pointsToAdd, rotOffs) s1Idx = let
     scanners' = scanners
     matches' = foldl(\matches point -> M.insertWith (++) point [] $ findMatches matches scanners point) matches pointsToAdd'
     pointsToAdd' = map fst neighbours
-    rotOffs' = foldl (\rotOffs (idx, ro) -> M.insert idx (s1RotOff . ro) rotOffs) rotOffs neighbours
+    rotOffs' = foldl (\rotOffs (idx, ro) -> M.insert idx (s1RotOff . ro) rotOffs) rotOffs neighbours  -- if scanners are rotated when added then this maybe is not needed?
     in (scanners', matches', resultSet', nub $ pointsToAdd ++ pointsToAdd', rotOffs')
 
 distance :: Point -> Point -> Int
