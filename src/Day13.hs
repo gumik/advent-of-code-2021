@@ -1,17 +1,17 @@
 {-# LANGUAGE TupleSections #-}
 module Day13 ( solution ) where
 
-import Common (Solution(Solution), NoSolution(..), readNum, showArray)
+import Common (Solution(Solution), NoSolution(..), readNum, showArray, ShowString(..))
 import Data.List.Split (splitOn)
 import Data.Bifunctor (bimap, Bifunctor (second, first))
 import Data.List (partition, nub, unfoldr, intercalate, transpose)
 import Data.Array (array, elems)
 import Debug.Trace (trace)
 
-solution :: Solution Int ShowSheet
+solution :: Solution Int ShowString
 solution = Solution "day13" "Transparent Origami" run
 
-run :: String -> (Int, ShowSheet)
+run :: String -> (Int, ShowString)
 run input = let
     (points, commands) = parse input
     folds = scanl fold points commands
@@ -20,9 +20,6 @@ run input = let
 type Point = (Int, Int)
 type Sheet = [Point]
 type Command = (Char, Int)
-newtype ShowSheet = ShowSheet String
-instance Show ShowSheet where
-    show (ShowSheet s) = s
 
 parse :: String -> ([Point], [Command])
 parse input = let
@@ -54,7 +51,7 @@ fold' axisSelector mapSelector points foldAxis = let
     folded = map (mapSelector ((2*foldAxis)-)) higher
     in nub $ lower ++ folded
 
-showSheet :: Sheet -> ShowSheet
+showSheet :: Sheet -> ShowString
 showSheet sheet = let
     xs = map fst sheet
     ys = map snd sheet
@@ -63,7 +60,7 @@ showSheet sheet = let
     lowY = minimum ys
     highY = maximum ys
     sheetArray = array ((lowX, lowY), (highX, highY)) $ [((x, y), ' ') | x <- [lowX..highX], y <- [lowY..highY]] ++ map (, '#') sheet
-    in ShowSheet $ intercalate "\n" $ transpose $ unfoldr (takeMaybe (highY - lowY + 1)) $ elems sheetArray
+    in ShowString $ intercalate "\n" $ transpose $ unfoldr (takeMaybe (highY - lowY + 1)) $ elems sheetArray
 
 takeMaybe :: Int -> [a] -> Maybe ([a], [a])
 takeMaybe n l = case l of
