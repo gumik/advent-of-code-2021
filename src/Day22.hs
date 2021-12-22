@@ -40,3 +40,12 @@ cubesOn = S.size . simulateNaiveWay . filter (\(Step _ ((x1, x2), (y1, y2), (z1,
 
 inSmallRange :: Int -> Bool
 inSmallRange x = x >= -50 && x <= 50
+
+
+data Segment = Segment Int Int [Segment] | Unit
+
+add :: [Segment] -> Segment -> [Segment]
+add segments Unit = segments
+add (s'@(Segment a' b' sub'):rest) s@(Segment a b sub)
+    | b <= a'           = s:s':rest
+    | b < b' && a < a'  =
