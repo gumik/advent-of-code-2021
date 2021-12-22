@@ -10,7 +10,9 @@ module Common (
     parseArray,
     showArray,
     inArrayBounds,
-    ShowString(..)) where
+    ShowString(..),
+    toTuple,
+    toTriple) where
 import Numeric (readInt)
 import Data.List.Split (splitOn, splitEvery)
 import Data.Array
@@ -65,3 +67,11 @@ showArray arr = let
 inArrayBounds arr (y, x) = let
     ((h0, w0), (hm, wm)) = bounds arr
     in x >= w0 && y >= h0 && x <= wm && y <= hm
+
+toTuple :: [a] -> (a, a)
+toTuple [x, y] = (x, y)
+toTuple _ = error "toTuple got list with length /= than 2"
+
+toTriple :: [a] -> (a, a, a)
+toTriple [x, y, z] = (x, y, z)
+toTriple _ = error "toTuple got list with length /= than 3"
