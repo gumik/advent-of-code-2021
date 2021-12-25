@@ -16,7 +16,7 @@ run input = let
 parse = M.fromList . map (second toSeaCucumber) . filter (isSeaCucumber . snd) . concat . zipWith parseLine [0..] . lines where
     parseLine y str = zipWith (\x c -> ((y,x),c)) [0..] str
 
-isSeaCucumber = any (==c) "v>"
+isSeaCucumber c = any (==c) "v>"
 
 toSeaCucumber c = case c of
     'v' -> South
