@@ -6,6 +6,8 @@ import Data.Bifunctor (bimap, Bifunctor (second))
 import qualified Data.Map.Strict as M
 
 data SeaCucumber = East | South deriving Show
+type Point = (Int, Int)
+type ScMap = M.Map Point SeaCucumber
 
 solution = Solution "day25" "" run
 
@@ -28,3 +30,13 @@ toSeaCucumber c = case c of
     '>' -> East
     _   -> error "invalid input"
 
+move :: (Int, Int) -> SeaCucumber -> ScMap -> ScMap
+move dim@(width, height) scType scMap = let
+    possibleToMove = filter ((==scType) . snd) $ M.toList scMap
+    toMove = filter canMove possibleToMove
+    newPos = map (first next) toMove
+    canMove (pos, _) = next pos `M.notMember` scMap
+    next (y,x) = case scType of
+        East -> (y, x+1 `mod` width)
+        South -> (y+1 `mod` height, x)
+    in (scMap M.\\ toMove) `M.union` newPos
