@@ -10,5 +10,5 @@ run input = let
     board = parse input
     in (board, NoSolution)
 
-parse = zipWith parseLine [0..] . lines where
-    parseLine y str = zip [0..] str
+parse = concat . zipWith parseLine [0..] . lines where
+    parseLine y str = zipWith (\x c -> ((y,x),c) [0..] str
