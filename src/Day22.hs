@@ -9,12 +9,15 @@ import qualified Data.Set as S
 data Step = Step Operation ((Int, Int), (Int, Int), (Int, Int)) deriving Show
 data Operation = On | Off deriving Show
 
-solution = Solution "day22" "" run
+solution :: Solution Int Int
+solution = Solution "day22" "Reactor Reboot" run
 
+run :: [Char] -> (Int, Int)
 run input = let
     commands = parse input
     in (cubesOn commands, cubesOn' commands)
 
+parse :: String -> [Step]
 parse = map parseLine . lines where
     parseLine l = let
         [opStr, rest] = splitOn " " l
@@ -27,16 +30,8 @@ parse = map parseLine . lines where
         "off" -> Off
         _ -> error "invalid operation"
 
-simulateNaiveWay :: [Step] -> S.Set (Int, Int, Int)
-simulateNaiveWay = foldl step S.empty where
-    step pointSet (Step operation ((minX, maxX), (minY, maxY), (minZ, maxZ))) = let
-        points = S.fromList [(x, y, z) | x <- [minX..maxX], y <- [minY..maxY], z <- [minZ..maxZ]]
-        in case operation of
-            On -> pointSet `S.union` points
-            Off -> pointSet `S.difference` points
-
 cubesOn :: [Step] -> Int
-cubesOn = S.size . simulateNaiveWay . filter (\(Step _ ((x1, x2), (y1, y2), (z1, z2))) -> all inSmallRange [x1, x2, y1, y2, z1, z2])
+cubesOn = sum . map area . simulateBetterWay . filter (\(Step _ ((x1, x2), (y1, y2), (z1, z2))) -> all inSmallRange [x1, x2, y1, y2, z1, z2])
 
 inSmallRange :: Int -> Bool
 inSmallRange x = x >= -50 && x <= 50
@@ -50,7 +45,7 @@ simulateBetterWay = foldl step [] where
             Off -> segments `removeS` segment
 
 cubesOn' :: [Step] -> Int
-cubesOn' = sum . map area . simulateBetterWay . filter (\(Step _ ((x1, x2), (y1, y2), (z1, z2))) -> all inSmallRange [x1, x2, y1, y2, z1, z2])
+cubesOn' = sum . map area . simulateBetterWay
 
 data Segment = Segment Int Int [Segment] | Unit deriving (Show, Eq)
 
@@ -72,9 +67,6 @@ add (b@(Segment b1 b2 subB):rest) a@(Segment a1 a2 [subA])
     | otherwise                      = b : add rest a
 add _ _ = error "unhandled case in add"
 
---                   a1        a2
---               b1        b2
--- remove [Unit] Unit
 remove :: [Segment] -> Segment -> [Segment]
 remove [Unit] Unit = []
 remove segments Unit = segments
@@ -101,7 +93,7 @@ simplify [Segment a b sub] = [Segment a b (simplify sub)]
 simplify (a@(Segment a1 a2 subA) : b@(Segment b1 b2 subB) : rest) =
     if a2 == b1 && subA' == subB'
         then simplify (Segment a1 b2 subA' : rest)
-        else Segment a1 b1 subA' : simplify (b:rest)
+        else Segment a1 a2 subA' : simplify (Segment b1 b2 subB' : rest)
     where
         subA' = simplify subA
         subB' = simplify subB
@@ -115,11 +107,3 @@ removeS s s1 = simplify $ s `remove` s1
 area :: Segment -> Int
 area Unit = 1
 area (Segment a b s) = (b - a) * sum (map area s)
-
-
-a = Segment 0 20 [Segment 0 20 [Unit]]
-b = Segment 10 30 [Segment 10 30 [Unit]]
-c = Segment 5 25 [Segment 15 25 [Unit]]
-
-s = [] `add` a `add` b `add` c
-s2 = ([] `add` a `add` b) `remove` c
