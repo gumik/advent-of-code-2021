@@ -11,4 +11,4 @@ run input = let
     in (board, NoSolution)
 
 parse = zipWith parseLine [0..] . lines where
-    parseLine (y, str) = zip [0..] str
+    parseLine y str = zip [0..] str
