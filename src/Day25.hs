@@ -13,12 +13,18 @@ run input = let
     board = parse input
     in (board, NoSolution)
 
-parse = M.fromList . map (second toSeaCucumber) . filter (isSeaCucumber . snd) . concat . zipWith parseLine [0..] . lines where
+parse input = let
+    rows = lines input
+    height = length rows
+    width = length $ head rows
+    points = concat $ zipWith parseLine [0..] $ lines input
     parseLine y str = zipWith (\x c -> ((y,x),c)) [0..] str
-
+    in ((height, width), M.fromList $ map (second toSeaCucumber) $ filter (isSeaCucumber . snd) $ points)
+    
 isSeaCucumber c = any (==c) "v>"
 
 toSeaCucumber c = case c of
     'v' -> South
     '>' -> East
     _   -> error "invalid input"
+
