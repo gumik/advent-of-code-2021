@@ -2,7 +2,7 @@ module Day25 ( solution ) where
 
 import Common (Solution(Solution), NoSolution(..), readNum)
 import Data.List.Split (splitOn)
-import Data.Bifunctor (bimap, Bifunctor (second))
+import Data.Bifunctor (bimap, Bifunctor (second, first))
 import qualified Data.Map.Strict as M
 
 data SeaCucumber = East | South deriving Show
