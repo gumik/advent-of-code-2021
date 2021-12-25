@@ -1,9 +1,42 @@
-module Day23 ( solution ) where
+#############
+#...........#
+###C#A#B#D###
+  #C#A#D#B#
+  #########
 
-import Common (Solution(Solution), NoSolution(..), readNum)
-import Data.List.Split (splitOn)
-import Data.Bifunctor (bimap)
+10
 
-solution = Solution "day23" "" run
+#############
+#AA.........#
+###C# #B#D###
+  #C# #D#B#
+  #########
 
-run _ = (NoSolution, NoSolution)
+50
+
+#############
+#AA.........#
+###C# # #D###
+  #C#B#D#B#
+  #########
+  
+2000
+
+#############
+#AA...... D.#
+###C# # # ###
+  #C#B#D#B#
+  #########
+  
+70, 6000, 2000
+  
+#############
+#AA......  .#
+###C#B# #D###
+  #C#B# #D#
+  #########
+  
+700, 700, 3, 3
+
+
+11536
