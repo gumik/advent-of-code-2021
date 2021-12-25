@@ -10,5 +10,10 @@ run input = let
     board = parse input
     in (board, NoSolution)
 
-parse = concat . zipWith parseLine [0..] . lines where
+parse = filter (isSeaCucumber . snd) . concat . zipWith parseLine [0..] . lines where
     parseLine y str = zipWith (\x c -> ((y,x),c)) [0..] str
+    
+isSeaCucumber c = case c of
+    'v' -> True
+    '>' -> True
+    _   -> False
