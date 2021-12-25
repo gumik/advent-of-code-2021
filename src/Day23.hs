@@ -4,7 +4,7 @@ import Common (Solution(Solution), NoSolution(..), readNum)
 import Data.List.Split (splitOn)
 import Data.Bifunctor (bimap)
 
-solution = Solution "day25" "" run
+solution = Solution "day23" "" run
 
 run _ = (NoSolution, NoSolution)
 
@@ -30,7 +30,7 @@ run _ = (NoSolution, NoSolution)
 ###C# # #D###
   #C#B#D#B#
   #########
-  
+
 2000
 
 #############
@@ -38,15 +38,15 @@ run _ = (NoSolution, NoSolution)
 ###C# # # ###
   #C#B#D#B#
   #########
-  
+
 70, 6000, 2000
-  
+
 #############
 #AA......  .#
 ###C#B# #D###
   #C#B# #D#
   #########
-  
+
 700, 700, 3, 3
 
 
