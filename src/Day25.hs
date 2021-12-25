@@ -11,4 +11,4 @@ run input = let
     in (board, NoSolution)
 
 parse = concat . zipWith parseLine [0..] . lines where
-    parseLine y str = zipWith (\x c -> ((y,x),c) [0..] str
+    parseLine y str = zipWith (\x c -> ((y,x),c)) [0..] str
