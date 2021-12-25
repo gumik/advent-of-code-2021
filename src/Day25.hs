@@ -6,4 +6,9 @@ import Data.Bifunctor (bimap)
 
 solution = Solution "day25" "" run
 
-run _ = (NoSolution, NoSolution)
+run input = let
+    board = parse input
+    in (board, NoSolution)
+
+parse = zipWith parseLine [0..] . lines where
+    parseLine = zip [0..]
