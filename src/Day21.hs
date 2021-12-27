@@ -50,4 +50,4 @@ add1 :: Maybe Int -> Maybe Int
 add1 Nothing = Just 1
 add1 (Just x) = Just (x+1)
 
-counts = M.fromListWith (+) [(a+b+c,1) | a<-[1..3], b<-[1..3], c<-[1..3]]
+counts = M.toList $ M.fromListWith (+) [(a+b+c,1) | a<-[1..3], b<-[1..3], c<-[1..3]]
