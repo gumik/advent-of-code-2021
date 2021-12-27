@@ -47,7 +47,7 @@ part1 iterations = let
     GameState round (PlayerStat p1Score _) (PlayerStat p2Score _) _ = winningIteration
     in 3*round * min p1Score p2Score
 
-f gs@(GameState round p1Score p2Score p1Pos p2Pos turn) states
+f gs@(GameState round p1 p2 turn) states
     | anyWin 21 gs || gs `M.member` states  = M.alter add1 gs states
     | otherwise                           = M.insert gs 1 states
         
