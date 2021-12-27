@@ -3,6 +3,7 @@ module Day21 ( solution ) where
 import Common (Solution(Solution), NoSolution(..), readNum)
 import Data.List.Split (splitOn)
 import qualified Data.Map.Strict as M
+import Data.Maybe
 
 data GameState = GameState {
     _round :: Int,
@@ -38,7 +39,13 @@ part1 iterations = let
     GameState round p1Score p2Score _ _ _ = winningIteration
     in 3*round * min p1Score p2Score
 
-f gs@(GameState round p1Score p2Score p1Pos p2Pos turn) states =
-    if gs `M.member` states
-        then M.adjust (+1) gs states
-        else M.insert gs 1 states
+anyWin' :: GameState -> Bool
+anyWin' (GameState _ p1Score p2Score _ _ _ ) = p1Score >= 21 || p2Score >= 21
+
+f gs@(GameState round p1Score p2Score p1Pos p2Pos turn) states
+    | anyWin' gs || gs `M.member` states  = M.alter add1 gs states
+    | otherwise                          = M.insert gs 1 states
+        
+add1 :: Maybe Int -> Maybe Int
+add1 Nothing = Just 1
+add1 (Just x) = Just (x+1)
