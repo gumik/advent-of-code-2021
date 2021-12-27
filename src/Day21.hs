@@ -38,7 +38,7 @@ move :: PlayerStat -> Int -> PlayerStat
 move (PlayerStat score pos) x = PlayerStat (score + pos') pos' where
     pos' = ((pos + x  - 1) `mod` 10) + 1 
 
-anyWin :: Int -> GameState -> Int -> Bool
+anyWin :: Int -> GameState -> Bool
 anyWin score (GameState _ (PlayerStat p1Score _) (PlayerStat p2Score _) _ ) = p1Score >= score || p2Score >= score
 
 part1 :: [(GameState, [Int])] -> Int
