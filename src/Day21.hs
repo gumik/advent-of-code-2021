@@ -7,13 +7,15 @@ import Data.Maybe
 
 data GameState = GameState {
     _round :: Int,
-    _player1Score :: Int,
-    _player2Score :: Int,
-    _player1Pos :: Int,
-    _player2Pos :: Int,
+    _player1Stat :: PlayerStat,
+    _player2Stat :: PlayerStat,
     _turn :: Turn
 } deriving (Show, Eq, Ord)
 data Turn = Player1Turn | Player2Turn deriving (Show, Eq, Ord)
+data PlayerStat = PlayerStat {
+    _score :: Int,
+    _pos :: Int
+} deriving (Show, Eq, Ord)
 
 solution = Solution "day21" "Dirac Dice" run
 
@@ -25,10 +27,16 @@ run _ = let
     in (part1 iterations, counts)
 
 game :: (GameState, [Int]) -> (GameState, [Int])
-game (g@(GameState round p1Score p2Score p1Pos p2Pos turn), x1:x2:x3:xs) = case turn of
-    Player1Turn -> let pos = ((p1Pos + x1 + x2 + x3 - 1) `mod` 10) + 1 in (GameState (round + 1) (p1Score + pos) p2Score pos p2Pos Player2Turn, xs)
-    Player2Turn -> let pos = ((p2Pos + x1 + x2 + x3 - 1) `mod` 10) + 1 in (GameState (round + 1) p1Score (p2Score + pos) p1Pos pos Player1Turn, xs)
+game (g@(GameState round p1 p2 turn), x1:x2:x3:xs) = case turn of
+    Player1Turn -> (GameState (round + 1) (move p1 x) p2 Player2Turn, xs)
+    Player2Turn -> (GameState (round + 1) p1 (move p2 x) Player1Turn, xs)
+  where
+    x = x1+x2+x3
 game _ = error "unexpected arguments"
+
+move :: PlayerStat -> Int -> PlayerStat
+move (PlayerStat score pos) x = PlayerStat (score + pos') pos' where
+    pos' = ((pos + x  - 1) `mod` 10) + 1 
 
 anyWin :: GameState -> Bool
 anyWin (GameState _ p1Score p2Score _ _ _ ) = p1Score >= 1000 || p2Score >= 1000
