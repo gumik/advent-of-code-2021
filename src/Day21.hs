@@ -41,4 +41,4 @@ part1 iterations = let
 f gs@(GameState round p1Score p2Score p1Pos p2Pos turn) states =
     if gs `M.member` states
         then M.adjust (+1) gs
-        else gs `M.insert` states
+        else gs `M.insert` states 1
