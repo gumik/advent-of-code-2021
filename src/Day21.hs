@@ -44,7 +44,7 @@ anyWin (GameState _ (PlayerStat p1Score _) (PlayerStat p2Score _) _ ) = p1Score 
 part1 :: [(GameState, [Int])] -> Int
 part1 iterations = let
     winningIteration = head $ dropWhile (not . anyWin) $ map fst iterations
-    GameState round p1Score p2Score _ _ _ = winningIteration
+    GameState round (PlayerStat p1Score _) (PlayerStat p2Score _) _ = winningIteration
     in 3*round * min p1Score p2Score
 
 anyWin' :: GameState -> Bool
