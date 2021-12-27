@@ -2,7 +2,7 @@ module Day21 ( solution ) where
 
 import Common (Solution(Solution), NoSolution(..), readNum)
 import Data.List.Split (splitOn)
-import Data.Bifunctor (bimap)
+import qualified Data.Map.Strict as M
 
 data GameState = GameState {
     _round :: Int,
@@ -11,7 +11,7 @@ data GameState = GameState {
     _player1Pos :: Int,
     _player2Pos :: Int,
     _turn :: Turn
-} deriving Show
+} deriving (Show, Eq, Ord)
 data Turn = Player1Turn | Player2Turn deriving Show
 
 solution = Solution "day21" "Dirac Dice" run
@@ -38,4 +38,7 @@ part1 iterations = let
     GameState round p1Score p2Score _ _ _ = winningIteration
     in 3*round * min p1Score p2Score
 
-f (GameState round p1Score p2Score p1Pos p2Pos turn) =
+f gs@(GameState round p1Score p2Score p1Pos p2Pos turn) states =
+    if gs `M.elem` states
+        then M.adjust (+1) gs
+        else gs `M.insert` states
