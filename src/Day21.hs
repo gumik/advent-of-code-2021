@@ -22,7 +22,7 @@ run _ = let
     p2Pos = 10
     dice = concat $ repeat [1..100]
     iterations = iterate game (GameState 0 0 0 p1Pos p2Pos Player1Turn, dice)
-    in (part1 iterations, NoSolution)
+    in (part1 iterations, counts)
 
 game :: (GameState, [Int]) -> (GameState, [Int])
 game (g@(GameState round p1Score p2Score p1Pos p2Pos turn), x1:x2:x3:xs) = case turn of
@@ -44,8 +44,10 @@ anyWin' (GameState _ p1Score p2Score _ _ _ ) = p1Score >= 21 || p2Score >= 21
 
 f gs@(GameState round p1Score p2Score p1Pos p2Pos turn) states
     | anyWin' gs || gs `M.member` states  = M.alter add1 gs states
-    | otherwise                          = M.insert gs 1 states
+    | otherwise                           = M.insert gs 1 states
         
 add1 :: Maybe Int -> Maybe Int
 add1 Nothing = Just 1
 add1 (Just x) = Just (x+1)
+
+counts = M.fromListWith (+) [(a+b+c,1) | a<-[1..3], b<-[1..3], c<-[1..3]]
