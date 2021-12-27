@@ -39,7 +39,7 @@ move (PlayerStat score pos) x = PlayerStat (score + pos') pos' where
     pos' = ((pos + x  - 1) `mod` 10) + 1 
 
 anyWin :: GameState -> Bool
-anyWin (GameState _ p1Score p2Score _ _ _ ) = p1Score >= 1000 || p2Score >= 1000
+anyWin (GameState _ (PlayerStat p1Score _) (PlayerStat p2Score _) _ ) = p1Score >= 1000 || p2Score >= 1000
 
 part1 :: [(GameState, [Int])] -> Int
 part1 iterations = let
