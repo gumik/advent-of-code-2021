@@ -23,7 +23,7 @@ run _ = let
     p1Pos = 7
     p2Pos = 10
     dice = concat $ repeat [1..100]
-    iterations = iterate game (GameState 0 0 0 p1Pos p2Pos Player1Turn, dice)
+    iterations = iterate game (GameState 0 (PlayerStat 0 p1Pos) (PlayerStat 0 p2Pos) Player1Turn, dice)
     in (part1 iterations, counts)
 
 game :: (GameState, [Int]) -> (GameState, [Int])
