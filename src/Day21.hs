@@ -38,20 +38,17 @@ move :: PlayerStat -> Int -> PlayerStat
 move (PlayerStat score pos) x = PlayerStat (score + pos') pos' where
     pos' = ((pos + x  - 1) `mod` 10) + 1 
 
-anyWin :: GameState -> Bool
-anyWin (GameState _ (PlayerStat p1Score _) (PlayerStat p2Score _) _ ) = p1Score >= 1000 || p2Score >= 1000
+anyWin :: Int -> GameState -> Int -> Bool
+anyWin score (GameState _ (PlayerStat p1Score _) (PlayerStat p2Score _) _ ) = p1Score >= score || p2Score >= score
 
 part1 :: [(GameState, [Int])] -> Int
 part1 iterations = let
-    winningIteration = head $ dropWhile (not . anyWin) $ map fst iterations
+    winningIteration = head $ dropWhile (not . anyWin 1000) $ map fst iterations
     GameState round (PlayerStat p1Score _) (PlayerStat p2Score _) _ = winningIteration
     in 3*round * min p1Score p2Score
 
-anyWin' :: GameState -> Bool
-anyWin' (GameState _ p1Score p2Score _ _ _ ) = p1Score >= 21 || p2Score >= 21
-
 f gs@(GameState round p1Score p2Score p1Pos p2Pos turn) states
-    | anyWin' gs || gs `M.member` states  = M.alter add1 gs states
+    | anyWin 21 gs || gs `M.member` states  = M.alter add1 gs states
     | otherwise                           = M.insert gs 1 states
         
 add1 :: Maybe Int -> Maybe Int
