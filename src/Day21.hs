@@ -39,6 +39,6 @@ part1 iterations = let
     in 3*round * min p1Score p2Score
 
 f gs@(GameState round p1Score p2Score p1Pos p2Pos turn) states =
-    if gs `M.elem` states
+    if gs `M.member` states
         then M.adjust (+1) gs
         else gs `M.insert` states
