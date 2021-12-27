@@ -12,7 +12,7 @@ data GameState = GameState {
     _player2Pos :: Int,
     _turn :: Turn
 } deriving (Show, Eq, Ord)
-data Turn = Player1Turn | Player2Turn deriving Show
+data Turn = Player1Turn | Player2Turn deriving (Show, Eq, Ord)
 
 solution = Solution "day21" "Dirac Dice" run
 
