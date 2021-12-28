@@ -4,7 +4,7 @@ import Common (Solution(Solution), NoSolution(..), readNum)
 import Data.List.Split (splitOn)
 import qualified Data.Map.Strict as M
 import Data.Maybe
-import Control.Monad.State (State)
+import Control.Monad.State.Strict
 
 data GameState = GameState {
     _round :: Int,
@@ -50,10 +50,16 @@ part1 iterations = let
 
 type DiracState = State (M.Map GameState Int)
 
-f :: GameState -> M.Map GameState Int -> M.Map GameState Int
-f gs@(GameState round p1 p2 turn) states
-    | anyWin 21 gs || gs `M.member` states  = M.alter add1 gs states
-    | otherwise                             = foldl (\states (x, cnt) -> f (step gs x) states) (M.insert gs 1 states) counts
+f :: GameState -> DiracState Int
+f gs@(GameState round p1 p2 turn) = do
+    states <- get
+    if anyWin 21 gs || gs `M.member` states
+        then do
+            put $ M.alter add1 gs states
+            return 1
+        else do
+            put $ M.insert gs 1 states
+            foldM (\(x, cnt) -> f (step gs x)) 1 counts
 
 step :: GameState -> Int -> GameState
 step (GameState _ p1 p2 turn) x = case turn of
