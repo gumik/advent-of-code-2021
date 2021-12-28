@@ -40,7 +40,7 @@ move (PlayerStat score pos) x = PlayerStat (score + pos') pos' where
     pos' = ((pos + x  - 1) `mod` 10) + 1
 
 anyWin :: Int -> GameState -> Bool
-anyWin score (GameState _ (PlayerStat p1Score _) (PlayerStat p2Score _) _ ) = p1Score >= score || p2Score >= score
+anyWin score gs = any ($gs) [p1Win, p2Win]
 
 p1Win :: Int -> GameState -> Bool
 p1Win score (GameState _ (PlayerStat p1Score _) _ _ ) = p1Score >= score
@@ -76,9 +76,5 @@ g :: GameState -> Int -> (Int, Int) -> DiracState Int
 g gs acc (x, cnt) = do
     rf <- f (step gs x)
     return $ acc + cnt * rf
-
-add1 :: Maybe Int -> Maybe Int
-add1 Nothing = Just 1
-add1 (Just x) = Just (x+1)
 
 counts = M.toList $ M.fromListWith (+) [(a+b+c,1) | a<-[1..3], b<-[1..3], c<-[1..3]]
