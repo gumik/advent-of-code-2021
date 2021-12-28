@@ -21,8 +21,8 @@ data PlayerStat = PlayerStat {
 solution = Solution "day21" "Dirac Dice" run
 
 run _ = let
-    p1Pos = 4 --7
-    p2Pos = 8 --10
+    p1Pos = 7
+    p2Pos = 10
     dice = concat $ repeat [1..100]
     iterations = iterate game (GameState 0 (PlayerStat 0 p1Pos) (PlayerStat 0 p2Pos) Player1Turn, dice)
     in (part1 iterations, evalState (f (GameState 0 (PlayerStat 0 p1Pos) (PlayerStat 0 p2Pos) Player1Turn)) M.empty)
