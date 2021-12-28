@@ -23,9 +23,7 @@ solution = Solution "day21" "Dirac Dice" run
 run _ = let
     p1Pos = 7
     p2Pos = 10
-    dice = concat $ repeat [1..100]
-    iterations = iterate game (GameState 0 (PlayerStat 0 p1Pos) (PlayerStat 0 p2Pos) Player1Turn, dice)
-    in (part1 iterations, evalState (f (GameState 0 (PlayerStat 0 p1Pos) (PlayerStat 0 p2Pos) Player1Turn)) M.empty)
+    in (part1 p1Pos p2Pos, evalState (f (GameState 0 (PlayerStat 0 p1Pos) (PlayerStat 0 p2Pos) Player1Turn)) M.empty)
 
 game :: (GameState, [Int]) -> (GameState, [Int])
 game (g@(GameState round p1 p2 turn), x1:x2:x3:xs) = case turn of
@@ -48,8 +46,10 @@ p1Win score (GameState _ (PlayerStat p1Score _) _ _ ) = p1Score >= score
 p2Win :: Int -> GameState -> Bool
 p2Win score (GameState _ _ (PlayerStat p2Score _) _ ) = p2Score >= score
 
-part1 :: [(GameState, [Int])] -> Int
-part1 iterations = let
+part1 :: Int -> Int -> Int
+part1 p1Pos p2Pos = let
+    dice = concat $ repeat [1..100]
+    iterations = iterate game (GameState 0 (PlayerStat 0 p1Pos) (PlayerStat 0 p2Pos) Player1Turn, dice)
     winningIteration = head $ dropWhile (not . anyWin 1000) $ map fst iterations
     GameState round (PlayerStat p1Score _) (PlayerStat p2Score _) _ = winningIteration
     in 3*round * min p1Score p2Score
