@@ -46,7 +46,7 @@ p1Win :: Int -> GameState -> Bool
 p1Win score (GameState _ (PlayerStat p1Score _) _ _ ) = p1Score >= score
 
 p2Win :: Int -> GameState -> Bool
-p2Win score (GameState _ _ (PlayerStat p2Score _) _ _ ) = p2Score >= score
+p2Win score (GameState _ _ (PlayerStat p2Score _) _ ) = p2Score >= score
 
 part1 :: [(GameState, [Int])] -> Int
 part1 iterations = let
