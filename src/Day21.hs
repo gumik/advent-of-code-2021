@@ -49,7 +49,7 @@ part1 iterations = let
 
 f gs@(GameState round p1 p2 turn) states
     | anyWin 21 gs || gs `M.member` states  = M.alter add1 gs states
-    | otherwise                           = M.insert gs 1 states
+    | otherwise                             = foldl (\states (x, cnt) -> f ) (M.insert gs 1 states) counts
         
 add1 :: Maybe Int -> Maybe Int
 add1 Nothing = Just 1
