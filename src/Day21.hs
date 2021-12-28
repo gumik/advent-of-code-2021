@@ -57,7 +57,7 @@ f gs@(GameState round p1 p2 turn) = do
     else if gs `M.member` states then return $ states M.! gs
     else do       
         put $ M.insert gs 1 states
-        foldM g 1 counts
+        foldM (g gs) 1 counts
 
 step :: GameState -> Int -> GameState
 step (GameState _ p1 p2 turn) x = case turn of
