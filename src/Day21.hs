@@ -63,7 +63,7 @@ f gs@(GameState round p1 p2 turn) = do
     else if p2Win 21 gs then return 0
     else if gs `M.member` states then return $ states M.! gs
     else do
-        result <- foldM (g gs) 1 counts
+        result <- foldM (g gs) 0 counts
         put $ M.insert gs result states
         return result
 
