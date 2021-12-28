@@ -42,6 +42,12 @@ move (PlayerStat score pos) x = PlayerStat (score + pos') pos' where
 anyWin :: Int -> GameState -> Bool
 anyWin score (GameState _ (PlayerStat p1Score _) (PlayerStat p2Score _) _ ) = p1Score >= score || p2Score >= score
 
+p1Win :: Int -> GameState -> Bool
+p1Win score (GameState _ (PlayerStat p1Score _) _ _ ) = p1Score >= score
+
+p2Win :: Int -> GameState -> Bool
+p2Win score (GameState _ _ (PlayerStat p2Score _) _ _ ) = p2Score >= score
+
 part1 :: [(GameState, [Int])] -> Int
 part1 iterations = let
     winningIteration = head $ dropWhile (not . anyWin 1000) $ map fst iterations
@@ -53,7 +59,8 @@ type DiracState = State (M.Map GameState Int)
 f :: GameState -> DiracState Int
 f gs@(GameState round p1 p2 turn) = do
     states <- get
-    if anyWin 21 gs then return 1
+    if p1Win 21 gs then return 1
+    else if p2Win 21 gs then return 0
     else if gs `M.member` states then return $ states M.! gs
     else do
         result <- foldM (g gs) 1 counts
