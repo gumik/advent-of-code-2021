@@ -59,7 +59,7 @@ f gs@(GameState round p1 p2 turn) = do
             return 1
         else do
             put $ M.insert gs 1 states
-            foldM (\n (x, cnt) -> n + cnt * f (step gs x)) 1 counts
+            foldM (\n (x, cnt) -> {-n + cnt *-} f (step gs x)) 1 counts
 
 step :: GameState -> Int -> GameState
 step (GameState _ p1 p2 turn) x = case turn of
