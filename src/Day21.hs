@@ -55,9 +55,10 @@ f gs@(GameState round p1 p2 turn) = do
     states <- get
     if anyWin 21 gs then return 1
     else if gs `M.member` states then return $ states M.! gs
-    else do       
-        put $ M.insert gs 1 states
-        foldM (g gs) 1 counts
+    else do
+        result <- foldM (g gs) 1 counts
+        put $ M.insert gs result states
+        return result
 
 step :: GameState -> Int -> GameState
 step (GameState _ p1 p2 turn) x = case turn of
