@@ -4,6 +4,7 @@ import Common (Solution(Solution), NoSolution(..), readNum)
 import Data.List.Split (splitOn)
 import qualified Data.Map.Strict as M
 import Data.Maybe
+import Control.Monad.State (State)
 
 data GameState = GameState {
     _round :: Int,
@@ -24,7 +25,7 @@ run _ = let
     p2Pos = 10
     dice = concat $ repeat [1..100]
     iterations = iterate game (GameState 0 (PlayerStat 0 p1Pos) (PlayerStat 0 p2Pos) Player1Turn, dice)
-    in (part1 iterations, counts)
+    in (part1 iterations, f (GameState 0 (PlayerStat 0 p1Pos) (PlayerStat 0 p2Pos) Player1Turn) M.empty)
 
 game :: (GameState, [Int]) -> (GameState, [Int])
 game (g@(GameState round p1 p2 turn), x1:x2:x3:xs) = case turn of
@@ -36,7 +37,7 @@ game _ = error "unexpected arguments"
 
 move :: PlayerStat -> Int -> PlayerStat
 move (PlayerStat score pos) x = PlayerStat (score + pos') pos' where
-    pos' = ((pos + x  - 1) `mod` 10) + 1 
+    pos' = ((pos + x  - 1) `mod` 10) + 1
 
 anyWin :: Int -> GameState -> Bool
 anyWin score (GameState _ (PlayerStat p1Score _) (PlayerStat p2Score _) _ ) = p1Score >= score || p2Score >= score
@@ -47,10 +48,18 @@ part1 iterations = let
     GameState round (PlayerStat p1Score _) (PlayerStat p2Score _) _ = winningIteration
     in 3*round * min p1Score p2Score
 
+type DiracState = State (M.Map GameState Int)
+
+f :: GameState -> M.Map GameState Int -> M.Map GameState Int
 f gs@(GameState round p1 p2 turn) states
     | anyWin 21 gs || gs `M.member` states  = M.alter add1 gs states
-    | otherwise                             = foldl (\states (x, cnt) -> f ) (M.insert gs 1 states) counts
-        
+    | otherwise                             = foldl (\states (x, cnt) -> f (step gs x) states) (M.insert gs 1 states) counts
+
+step :: GameState -> Int -> GameState
+step (GameState _ p1 p2 turn) x = case turn of
+    Player1Turn -> GameState 0 (move p1 x) p2 Player2Turn
+    Player2Turn -> GameState 0 p1 (move p2 x) Player1Turn
+
 add1 :: Maybe Int -> Maybe Int
 add1 Nothing = Just 1
 add1 (Just x) = Just (x+1)
