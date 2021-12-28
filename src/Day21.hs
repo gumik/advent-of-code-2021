@@ -25,7 +25,7 @@ run _ = let
     p2Pos = 10
     dice = concat $ repeat [1..100]
     iterations = iterate game (GameState 0 (PlayerStat 0 p1Pos) (PlayerStat 0 p2Pos) Player1Turn, dice)
-    in (part1 iterations, 0 {-f (GameState 0 (PlayerStat 0 p1Pos) (PlayerStat 0 p2Pos) Player1Turn) M.empty-})
+    in (part1 iterations, evalState (f (GameState 0 (PlayerStat 0 p1Pos) (PlayerStat 0 p2Pos) Player1Turn)) M.empty)
 
 game :: (GameState, [Int]) -> (GameState, [Int])
 game (g@(GameState round p1 p2 turn), x1:x2:x3:xs) = case turn of
