@@ -53,16 +53,21 @@ type DiracState = State (M.Map GameState Int)
 f :: GameState -> DiracState Int
 f gs@(GameState round p1 p2 turn) = do
     states <- get
-    if anyWin 21 gs then put (M.alter add1 gs states) >> return 1
+    if anyWin 21 gs then return 1
     else if gs `M.member` states then return $ states M.! gs
     else do       
         put $ M.insert gs 1 states
-        foldM (\n (x, cnt) -> {-n + cnt *-} f (step gs x)) 1 counts
+        foldM g 1 counts
 
 step :: GameState -> Int -> GameState
 step (GameState _ p1 p2 turn) x = case turn of
     Player1Turn -> GameState 0 (move p1 x) p2 Player2Turn
     Player2Turn -> GameState 0 p1 (move p2 x) Player1Turn
+
+g :: GameState -> Int -> (Int, Int) -> DiracState Int
+g gs acc (x, cnt) = do
+    rf <- f (step gs x)
+    return $ acc + cnt * rf
 
 add1 :: Maybe Int -> Maybe Int
 add1 Nothing = Just 1
