@@ -40,7 +40,7 @@ move (PlayerStat score pos) x = PlayerStat (score + pos') pos' where
     pos' = ((pos + x  - 1) `mod` 10) + 1
 
 anyWin :: Int -> GameState -> Bool
-anyWin score gs = any ($gs) [p1Win, p2Win]
+anyWin score gs = any ($ score $ gs) [p1Win, p2Win]
 
 p1Win :: Int -> GameState -> Bool
 p1Win score (GameState _ (PlayerStat p1Score _) _ _ ) = p1Score >= score
