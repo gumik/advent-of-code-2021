@@ -23,7 +23,8 @@ solution = Solution "day21" "Dirac Dice" run
 run _ = let
     p1Pos = 7
     p2Pos = 10
-    in (part1 p1Pos p2Pos, evalState (f (GameState 0 (PlayerStat 0 p1Pos) (PlayerStat 0 p2Pos) Player1Turn)) M.empty)
+    (part2, states) = runState (f (GameState 0 (PlayerStat 0 p1Pos) (PlayerStat 0 p2Pos) Player1Turn)) M.empty
+    in (part1 p1Pos p2Pos, (part2, M.size states))
 
 game :: (GameState, [Int]) -> (GameState, [Int])
 game (g@(GameState round p1 p2 turn), x1:x2:x3:xs) = case turn of
