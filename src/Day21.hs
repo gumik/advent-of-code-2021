@@ -26,12 +26,7 @@ run _ = let
     in (part1 p1Pos p2Pos, (part2, M.size states))
 
 game :: (GameState, [Int]) -> (GameState, [Int])
-game (g@(GameState p1 p2 turn), x1:x2:x3:xs) = case turn of
-    Player1Turn -> (GameState (move p1 x) p2 Player2Turn, xs)
-    Player2Turn -> (GameState p1 (move p2 x) Player1Turn, xs)
-  where
-    x = x1+x2+x3
-game _ = error "unexpected arguments"
+game (gs, dice) = (step g (sum $ take 3 dice), drop 3 dice)
 
 move :: PlayerStat -> Int -> PlayerStat
 move (PlayerStat score pos) x = PlayerStat (score + pos') pos' where
