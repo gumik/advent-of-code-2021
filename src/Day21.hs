@@ -1,6 +1,6 @@
 module Day21 ( solution ) where
 
-import Common (Solution(Solution), NoSolution(..), readNum)
+import Common (Solution(Solution), NoSolution(..), readNum, toTuple)
 import Data.List.Split (splitOn)
 import qualified Data.Map.Strict as M
 import Data.Maybe
@@ -19,11 +19,12 @@ data PlayerStat = PlayerStat {
 
 solution = Solution "day21" "Dirac Dice" run
 
-run _ = let
-    p1Pos = 7
-    p2Pos = 10
+run input = let
+    (p1Pos, p2Pos) = parse input
     initialState = GameState (PlayerStat 0 p1Pos) (PlayerStat 0 p2Pos) Player1Turn
     in (part1 initialState, part2 initialState)
+
+parse = toTuple . map ((!! 4) . splitOn " ") . lines
 
 part1 :: GameState -> Int
 part1 initialState = let
