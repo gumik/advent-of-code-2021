@@ -17,13 +17,16 @@ data PlayerStat = PlayerStat {
     _pos :: Int
 } deriving (Show, Eq, Ord)
 
+solution :: Solution Int Int
 solution = Solution "day21" "Dirac Dice" run
 
+run :: String -> (Int, Int)
 run input = let
     (p1Pos, p2Pos) = parse input
     initialState = GameState (PlayerStat 0 p1Pos) (PlayerStat 0 p2Pos) Player1Turn
     in (part1 initialState, part2 initialState)
 
+parse :: String -> (Int, Int)
 parse = toTuple . map (readNum . (!! 4) . splitOn " ") . lines
 
 part1 :: GameState -> Int
