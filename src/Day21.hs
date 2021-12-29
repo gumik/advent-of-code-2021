@@ -51,7 +51,7 @@ part1 p1Pos p2Pos = let
     dice = concat $ repeat [1..100]
     iterations = iterate game (GameState (PlayerStat 0 p1Pos) (PlayerStat 0 p2Pos) Player1Turn, dice)
     winningIteration = head $ dropWhile (not . anyWin 1000 . snd) $ zip [0..] $ map fst iterations
-    (round, GameState round (PlayerStat p1Score _) (PlayerStat p2Score _) _) = winningIteration
+    (round, GameState (PlayerStat p1Score _) (PlayerStat p2Score _) _) = winningIteration
     in 3*round * min p1Score p2Score
 
 type DiracState = State (M.Map GameState Int)
