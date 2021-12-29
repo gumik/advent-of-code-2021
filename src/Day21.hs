@@ -22,12 +22,13 @@ solution = Solution "day21" "Dirac Dice" run
 run _ = let
     p1Pos = 7
     p2Pos = 10
-    in (part1 p1Pos p2Pos, part2 p1Pos p2Pos)
+    initialState = GameState (PlayerStat 0 p1Pos) (PlayerStat 0 p2Pos) Player1Turn
+    in (part1 initialState, part2 initialState)
 
-part1 :: Int -> Int -> Int
-part1 p1Pos p2Pos = let
+part1 :: GameState -> Int
+part1 initialState = let
     dice = concat $ repeat [1..100]
-    iterations = iterate game (GameState (PlayerStat 0 p1Pos) (PlayerStat 0 p2Pos) Player1Turn, dice)
+    iterations = iterate game (initialState, dice)
     winningIteration = head $ dropWhile (not . anyWin 1000 . snd) $ zip [0..] $ map fst iterations
     (round, GameState (PlayerStat p1Score _) (PlayerStat p2Score _) _) = winningIteration
     in 3*round * min p1Score p2Score
@@ -56,8 +57,8 @@ p2Win score (GameState _ (PlayerStat p2Score _) _ ) = p2Score >= score
 
 type DiracState = State (M.Map GameState Int)
 
-part2 :: Int -> Int -> Int
-part2 p1Pos p2Pos = evalState (f (GameState (PlayerStat 0 p1Pos) (PlayerStat 0 p2Pos) Player1Turn)) M.empty
+part2 :: GameState -> Int
+part2 initialState = evalState (f initialState) M.empty
 
 f :: GameState -> DiracState Int
 f gs@(GameState p1 p2 turn) = do
@@ -69,7 +70,6 @@ f gs@(GameState p1 p2 turn) = do
         result <- foldM (g gs) 0 counts
         modify $ M.insert gs result
         return result
-
 
 g :: GameState -> Int -> (Int, Int) -> DiracState Int
 g gs acc (x, cnt) = do
