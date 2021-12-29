@@ -7,7 +7,6 @@ import Data.Maybe
 import Control.Monad.State.Strict
 
 data GameState = GameState {
-    _round :: Int,
     _player1Stat :: PlayerStat,
     _player2Stat :: PlayerStat,
     _turn :: Turn
@@ -23,13 +22,13 @@ solution = Solution "day21" "Dirac Dice" run
 run _ = let
     p1Pos = 7
     p2Pos = 10
-    (part2, states) = runState (f (GameState 0 (PlayerStat 0 p1Pos) (PlayerStat 0 p2Pos) Player1Turn)) M.empty
+    (part2, states) = runState (f (GameState (PlayerStat 0 p1Pos) (PlayerStat 0 p2Pos) Player1Turn)) M.empty
     in (part1 p1Pos p2Pos, (part2, M.size states))
 
 game :: (GameState, [Int]) -> (GameState, [Int])
-game (g@(GameState round p1 p2 turn), x1:x2:x3:xs) = case turn of
-    Player1Turn -> (GameState (round + 1) (move p1 x) p2 Player2Turn, xs)
-    Player2Turn -> (GameState (round + 1) p1 (move p2 x) Player1Turn, xs)
+game (g@(GameState p1 p2 turn), x1:x2:x3:xs) = case turn of
+    Player1Turn -> (GameState (move p1 x) p2 Player2Turn, xs)
+    Player2Turn -> (GameState p1 (move p2 x) Player1Turn, xs)
   where
     x = x1+x2+x3
 game _ = error "unexpected arguments"
@@ -50,9 +49,9 @@ p2Win score (GameState _ _ (PlayerStat p2Score _) _ ) = p2Score >= score
 part1 :: Int -> Int -> Int
 part1 p1Pos p2Pos = let
     dice = concat $ repeat [1..100]
-    iterations = iterate game (GameState 0 (PlayerStat 0 p1Pos) (PlayerStat 0 p2Pos) Player1Turn, dice)
-    winningIteration = head $ dropWhile (not . anyWin 1000) $ map fst iterations
-    GameState round (PlayerStat p1Score _) (PlayerStat p2Score _) _ = winningIteration
+    iterations = iterate game (GameState (PlayerStat 0 p1Pos) (PlayerStat 0 p2Pos) Player1Turn, dice)
+    winningIteration = head $ dropWhile (not . anyWin 1000 . snd) $ zip [0..] $ map fst iterations
+    (round, GameState round (PlayerStat p1Score _) (PlayerStat p2Score _) _) = winningIteration
     in 3*round * min p1Score p2Score
 
 type DiracState = State (M.Map GameState Int)
@@ -69,9 +68,9 @@ f gs@(GameState round p1 p2 turn) = do
         return result
 
 step :: GameState -> Int -> GameState
-step (GameState _ p1 p2 turn) x = case turn of
-    Player1Turn -> GameState 0 (move p1 x) p2 Player2Turn
-    Player2Turn -> GameState 0 p1 (move p2 x) Player1Turn
+step (GameState p1 p2 turn) x = case turn of
+    Player1Turn -> GameState (move p1 x) p2 Player2Turn
+    Player2Turn -> GameState p1 (move p2 x) Player1Turn
 
 g :: GameState -> Int -> (Int, Int) -> DiracState Int
 g gs acc (x, cnt) = do
