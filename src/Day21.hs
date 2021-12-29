@@ -69,8 +69,6 @@ f gs@(GameState p1 p2 turn) = do
 
 
 g :: GameState -> Int -> (Int, Int) -> DiracState Int
-g gs acc (x, cnt) = do
-    rf <- f (step gs x)
-    return $ acc + cnt * rf
+g gs acc (x, cnt) = f (step gs x) >>= return $ acc + cnt *
 
 counts = M.toList $ M.fromListWith (+) [(a+b+c,1) | a<-[1..3], b<-[1..3], c<-[1..3]]
