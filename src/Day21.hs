@@ -41,10 +41,10 @@ anyWin :: Int -> GameState -> Bool
 anyWin score gs = p1Win score gs || p2Win score gs
 
 p1Win :: Int -> GameState -> Bool
-p1Win score (GameState _ (PlayerStat p1Score _) _ _ ) = p1Score >= score
+p1Win score (GameState (PlayerStat p1Score _) _ _ ) = p1Score >= score
 
 p2Win :: Int -> GameState -> Bool
-p2Win score (GameState _ _ (PlayerStat p2Score _) _ ) = p2Score >= score
+p2Win score (GameState _ (PlayerStat p2Score _) _ ) = p2Score >= score
 
 part1 :: Int -> Int -> Int
 part1 p1Pos p2Pos = let
@@ -57,7 +57,7 @@ part1 p1Pos p2Pos = let
 type DiracState = State (M.Map GameState Int)
 
 f :: GameState -> DiracState Int
-f gs@(GameState round p1 p2 turn) = do
+f gs@(GameState p1 p2 turn) = do
     states <- get
     if p1Win 21 gs then return 1
     else if p2Win 21 gs then return 0
