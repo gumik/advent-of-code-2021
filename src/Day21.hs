@@ -24,7 +24,7 @@ run input = let
     initialState = GameState (PlayerStat 0 p1Pos) (PlayerStat 0 p2Pos) Player1Turn
     in (part1 initialState, part2 initialState)
 
-parse = toTuple . map ((!! 4) . splitOn " ") . lines
+parse = toTuple . map (readNum . (!! 4) . splitOn " ") . lines
 
 part1 :: GameState -> Int
 part1 initialState = let
