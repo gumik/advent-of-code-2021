@@ -57,7 +57,7 @@ p2Win score (GameState _ (PlayerStat p2Score _) _ ) = p2Score >= score
 type DiracState = State (M.Map GameState Int)
 
 part2 :: Int -> Int -> Int
-part2 = evalState (f (GameState (PlayerStat 0 p1Pos) (PlayerStat 0 p2Pos) Player1Turn)) M.empty
+part2 p1Pos p2Pos = evalState (f (GameState (PlayerStat 0 p1Pos) (PlayerStat 0 p2Pos) Player1Turn)) M.empty
 
 f :: GameState -> DiracState Int
 f gs@(GameState p1 p2 turn) = do
