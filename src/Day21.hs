@@ -26,7 +26,7 @@ run _ = let
     in (part1 p1Pos p2Pos, (part2, M.size states))
 
 game :: (GameState, [Int]) -> (GameState, [Int])
-game (gs, dice) = (step g (sum $ take 3 dice), drop 3 dice)
+game (gs, dice) = (step gs (sum $ take 3 dice), drop 3 dice)
 
 move :: PlayerStat -> Int -> PlayerStat
 move (PlayerStat score pos) x = PlayerStat (score + pos') pos' where
