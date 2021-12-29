@@ -60,20 +60,21 @@ type DiracState = State (M.Map GameState Int)
 part2 :: GameState -> Int
 part2 initialState = evalState (f initialState) M.empty
 
-f :: GameState -> DiracState Int
-f gs@(GameState p1 p2 turn) = do
+p1WinsUniversesCount :: GameState -> DiracState Int
+p1WinsUniversesCount gs = do
     states <- get
     if p1Win 21 gs then return 1
     else if p2Win 21 gs then return 0
     else if gs `M.member` states then return $ states M.! gs
     else do
-        result <- foldM (g gs) 0 counts
+        result <- foldM (accumulateNextStep gs) 0 counts
         modify $ M.insert gs result
         return result
 
-g :: GameState -> Int -> (Int, Int) -> DiracState Int
-g gs acc (x, cnt) = do
-    rf <- f (step gs x)
+accumulateNextStep :: GameState -> Int -> (Int, Int) -> DiracState Int
+accumulateNextStep gs acc (x, cnt) = do
+    rf <- p1WinsUniversesCount (step gs x)
     return $ acc + cnt * rf
 
+counts :: [(Int, Int)]
 counts = M.toList $ M.fromListWith (+) [(a+b+c,1) | a<-[1..3], b<-[1..3], c<-[1..3]]
