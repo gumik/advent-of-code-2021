@@ -32,6 +32,11 @@ move :: PlayerStat -> Int -> PlayerStat
 move (PlayerStat score pos) x = PlayerStat (score + pos') pos' where
     pos' = ((pos + x  - 1) `mod` 10) + 1
 
+step :: GameState -> Int -> GameState
+step (GameState p1 p2 turn) x = case turn of
+    Player1Turn -> GameState (move p1 x) p2 Player2Turn
+    Player2Turn -> GameState p1 (move p2 x) Player1Turn
+
 anyWin :: Int -> GameState -> Bool
 anyWin score gs = p1Win score gs || p2Win score gs
 
@@ -62,10 +67,6 @@ f gs@(GameState p1 p2 turn) = do
         modify $ M.insert gs result
         return result
 
-step :: GameState -> Int -> GameState
-step (GameState p1 p2 turn) x = case turn of
-    Player1Turn -> GameState (move p1 x) p2 Player2Turn
-    Player2Turn -> GameState p1 (move p2 x) Player1Turn
 
 g :: GameState -> Int -> (Int, Int) -> DiracState Int
 g gs acc (x, cnt) = do
