@@ -58,7 +58,7 @@ p2Win score (GameState _ (PlayerStat p2Score _) _ ) = p2Score >= score
 type DiracState = State (M.Map GameState Int)
 
 part2 :: GameState -> Int
-part2 initialState = evalState (f initialState) M.empty
+part2 initialState = evalState (p1WinsUniversesCount initialState) M.empty
 
 p1WinsUniversesCount :: GameState -> DiracState Int
 p1WinsUniversesCount gs = do
