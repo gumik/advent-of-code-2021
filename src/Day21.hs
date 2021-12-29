@@ -63,12 +63,8 @@ f gs@(GameState p1 p2 turn) = do
     else if p2Win 21 gs then return 0
     else if gs `M.member` states then return $ states M.! gs
     else do
-        result <- foldM (g gs) 0 counts
+        result <- foldM (\acc (x, cnt) -> f (step gs x) >>= return . (acc +) . (cnt *)) 0 counts
         modify $ M.insert gs result
         return result
-
-
-g :: GameState -> Int -> (Int, Int) -> DiracState Int
-g gs acc (x, cnt) = f (step gs x) >>= return . (acc +) . (cnt *)
 
 counts = M.toList $ M.fromListWith (+) [(a+b+c,1) | a<-[1..3], b<-[1..3], c<-[1..3]]
