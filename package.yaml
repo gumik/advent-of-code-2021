@@ -41,3 +41,15 @@ executables:
     - advent-of-code
     - containers
     - split
+
+tests:
+  advent-of-code-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - advent-of-code
+    - HUnit
