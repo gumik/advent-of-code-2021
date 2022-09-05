@@ -63,17 +63,17 @@ splitSegments :: [Segment] -> [Int] -> [Segment]
 splitSegments [] _ = []
 splitSegments segs [] = segs
 splitSegments segs@(seg@(Segment a1 a2 sub) : rest) idxs@(x:xs)
-    | x <= a1           = splitSegments segs xs
-    | x > a1 && x < a2  = Segment a1 x sub : splitSegments (Segment x a2 sub : rest) xs
-    | x >= a2           = seg : splitSegments rest idxs
+    | x <= a1    = splitSegments segs xs
+    | x < a2     = Segment a1 x sub : splitSegments (Segment x a2 sub : rest) xs
+    | otherwise  = seg : splitSegments rest idxs
 
 merge :: [Segment] -> [Segment] -> [Segment]
 merge [] segments = segments
 merge segments [] = segments
 merge segsA@(a@(Segment a1 a2 [subA]):restA) segsB@(b@(Segment b1 b2 subB):restB)
-    | a1 == b1 && a2 == b2  = (Segment a1 b2 (add subB subA)) : merge restA restB
-    | a1 < b1               = a : merge restA segsB
-    | b1 < a1               = b : merge segsA restB
+    | a1 < b1    = a : merge restA segsB
+    | b1 < a1    = b : merge segsA restB
+    | otherwise  = (Segment a1 b2 (add subB subA)) : merge restA restB
 
 indices :: [Segment] -> [Int]
 indices = uniq . concat . map segIndices
