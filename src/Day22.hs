@@ -49,23 +49,40 @@ cubesOn' = sum . map area . simulateBetterWay
 
 data Segment = Segment Int Int [Segment] | Unit deriving (Show, Eq)
 
--- This may be simplified probably
+
 add :: [Segment] -> Segment -> [Segment]
 add segments Unit = segments
 add [] segment = [segment]
-add (b@(Segment b1 b2 subB):rest) a@(Segment a1 a2 [subA])
-    | a2 <= b1                       = a:b:rest
-    | a2 < b2 && a1 < b1             = Segment a1 b1 [subA] : Segment b1 a2 (add subB subA) : Segment a2 b2 subB : rest
-    | a2 < b2 && a1 == b1            = Segment a1 a2 (add subB subA) : Segment a2 b2 subB : rest
-    | a2 < b2 && a1 > b1             = Segment b1 a1 subB : Segment a1 a2 (add subB subA) : Segment a2 b2 subB : rest
-    | a2 == b2 && a1 < b1            = Segment a1 b1 [subA] : Segment b1 b2 (add subB subA) : rest
-    | a2 == b2 && a1 == b1           = Segment b1 b2 (add subB subA) : rest
-    | a2 == b2 && a1 > b1            = Segment b1 a1 subB : Segment a1 a2 (add subB subA) : rest
-    | a2 > b2 && a1 < b1             = Segment a1 b1 [subA] : Segment b1 b2 (add subB subA) : add rest (Segment b2 a2 [subA])
-    | a2 > b2 && a1 == b1            = Segment b1 b2 (add subB subA) : add rest (Segment b2 a2 [subA])
-    | a2 > b2 && a1 > b1 && a1 < b2  = Segment b1 a1 subB : Segment a1 b2 (add subB subA) : add rest (Segment b2 a2 [subA])
-    | otherwise                      = b : add rest a
-add _ _ = error "unhandled case in add"
+add segments a@(Segment a1 a2 [subA]) = merge partA partB where
+    partB = splitSegments segments (indices [a])
+    partA = splitSegments [a] (indices segments)
+add segments segment = error $ "unhandled case in add: " ++ show segments ++ ", " ++ show segment
+
+
+splitSegments :: [Segment] -> [Int] -> [Segment]
+splitSegments [] _ = []
+splitSegments segs [] = segs
+splitSegments segs@(seg@(Segment a1 a2 sub) : rest) idxs@(x:xs)
+    | x <= a1           = splitSegments segs xs
+    | x > a1 && x < a2  = Segment a1 x sub : splitSegments (Segment x a2 sub : rest) xs
+    | x >= a2           = seg : splitSegments rest idxs
+
+merge :: [Segment] -> [Segment] -> [Segment]
+merge [] segments = segments
+merge segments [] = segments
+merge segsA@(a@(Segment a1 a2 [subA]):restA) segsB@(b@(Segment b1 b2 subB):restB)
+    | a1 == b1 && a2 == b2  = (Segment a1 b2 (add subB subA)) : merge restA restB
+    | a1 < b1               = a : merge restA segsB
+    | b1 < a1               = b : merge segsA restB
+
+indices :: [Segment] -> [Int]
+indices = uniq . concat . map segIndices
+
+uniq (a:b:xs) = if a == b then a:uniq xs else a:b:uniq xs
+uniq xs = xs
+
+segIndices (Segment a b _) = [a, b]
+
 
 remove :: [Segment] -> Segment -> [Segment]
 remove [Unit] Unit = []
